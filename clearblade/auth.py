@@ -39,7 +39,7 @@ class Auth():
 			resp = json.loads(resp.text)
 			client.DevToken = str(resp['dev_token'])					
 			
-	def authAnon(self, UserClient):
+	def authAnon(self, client):
 		headers = {
 			"Content-Type" : "application/json",
 			"Accept" : "application/json",
@@ -65,15 +65,24 @@ class Auth():
 		}	
 		resp = requests.post(endpoint, data=json.dumps(payload), headers=headers)
 		print resp.text
+		resp = json.loads(resp.text)
+		client.UserToken = str(resp['user_id'])
 
-	def RegisterDevUser(self, username, password, UserClient):
-		if UserClient.UserToken == "":
+	def RegisterDevUser(self, username, password, client):
+		if client.DevToken == "":
 			print "Must be logged in to create user"
 			exit(1)
-		endpoint = "https://sandbox.clearblade.com/admin/user/" + UserClient.systemKey
+		endpoint = self.CB_ADDR + "/admin/user/" + client.systemKey
 		payload = {
 			"email" : username,
 			"password" : password
 		}	
-		resp = requests.post(endpoint, data=json.dumps(payload))
-		print resp.text	
+		headers = {
+			"ClearBlade-SystemSecret" : client.systemSecret,
+			"ClearBlade-SystemKey" : client.systemKey,
+			"ClearBlade-DevToken" : client.DevToken
+		}	
+		resp = requests.post(endpoint, data=json.dumps(payload), headers=headers)
+		print resp.text
+		resp = json.loads(resp.text)	
+		client.DevToken = str(resp['user_id'])	
