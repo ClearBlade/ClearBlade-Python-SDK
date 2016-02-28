@@ -12,7 +12,7 @@ auth.Authenticate(userClient)
 
 message = Messaging.Messaging(userClient)
 message.printValue()
-message.InitializeMQTT(900)
+message.InitializeMQTT(60)
 
 message.subscribe("weather", 1)
 time.sleep(5)
@@ -22,4 +22,5 @@ while count < 100:
 	time.sleep(1)
 	if count == 50:
 		print "Waiting 2 minutes"
-		time.sleep(120)
+		time.sleep(90)
+		message.subscribe("weather", 1)

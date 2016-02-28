@@ -12,7 +12,7 @@ auth.Authenticate(userClient)
 
 message = Messaging.Messaging(userClient)
 message.printValue()
-message.InitializeMQTT(900)
+message.InitializeMQTT(60)
 
 i=0
 time.sleep(5)
@@ -22,4 +22,4 @@ while i<100:
 	i = i+1
 	if i == 50:
 		print "Waiting 2 minutes"
-		time.sleep(120)
+		time.sleep(90)
