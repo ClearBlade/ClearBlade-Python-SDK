@@ -1,5 +1,3 @@
-# from auth import Auth
-
 class Client():
 	pass
 

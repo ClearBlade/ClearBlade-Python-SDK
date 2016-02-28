@@ -18,7 +18,7 @@ class Messaging():
 		if isinstance(self.clientType, Client.DevClient):
 			print self.clientType.email	
 
-	def InitializeMQTT(self):
+	def InitializeMQTT(self, timeout):
 		if isinstance(self.clientType, Client.UserClient):
 			self.client = mqtt.Client(client_id=self.clientType.systemSecret, protocol=mqtt.MQTTv31)
 			self.client.username_pw_set(self.clientType.UserToken, self.clientType.systemKey)
@@ -35,7 +35,7 @@ class Messaging():
 
 		self.client.on_connect = on_connect
 		
-		self.client.connect(self.CB_MSG_ADDR, 1883, 60)
+		self.client.connect(self.CB_MSG_ADDR, 1883, timeout)
 		self.client.loop_start()
 
 	def publishMessage(self, topic, data, qos):	
