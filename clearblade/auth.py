@@ -98,8 +98,3 @@ class Auth():
 			client.DevToken = str(resp['user_id'])	
 		except ValueError:
 				print "JSON Decode has failed because of error : ", resp.text	
-
-
-devClient = Client.DevClient("eeccc5eb0af8d5e6b5a4c094a474", "EECCC5EB0A90EBC6E09CEE95E65D", "roha@clearblade.com", "rohanbendre")
-auth = Auth()
-auth.Authenticate(devClient)
