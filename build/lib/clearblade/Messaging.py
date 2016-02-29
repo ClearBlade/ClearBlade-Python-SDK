@@ -4,13 +4,17 @@ import time
 import Client
 import UserClient 
 import math
+import random
+import string
+from urlparse import urlparse
 
 class Messaging():
-	CB_MSG_ADDR = "rtp.clearblade.com"
+	CB_MSG_ADDR = ""
 	def __init__(self, clientType):
 		self.client = ""
 		self.rc = 0
 		self.clientType = clientType
+		self.CB_MSG_ADDR = urlparse(clientType.platform).netloc
 
 	def printValue(self):
 		if isinstance(self.clientType, Client.UserClient):
@@ -20,11 +24,12 @@ class Messaging():
 
 	def InitializeMQTT(self, timeout):
 		if isinstance(self.clientType, Client.UserClient):
-			self.client = mqtt.Client(client_id=self.clientType.systemSecret, protocol=mqtt.MQTTv31)
+			self.client = mqtt.Client(client_id=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(23)), protocol=mqtt.MQTTv31)
 			self.client.username_pw_set(self.clientType.UserToken, self.clientType.systemKey)
+			print self.clientType.UserToken
 		if isinstance(self.clientType, Client.DevClient):
-			self.client = mqtt.Client(client_id=self.clientType.systemSecret, protocol=mqtt.MQTTv31)
-			self.client.username_pw_set(self.clientType.DevToken, self.clientType.systemSecret)
+			self.client = mqtt.Client(client_id=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(23)), protocol=mqtt.MQTTv31)
+			self.client.username_pw_set(self.clientType.DevToken, self.clientType.systemKey)
 		
 		def on_connect(client, flag, userdata, rc):
 			if rc == 0:

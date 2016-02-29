@@ -13,8 +13,6 @@ import time
 
 class Auth(): 
 
-	CB_ADDR = "https://rtp.clearblade.com"
-
 	def Authenticate(self, client):
 		payload = {
 			"email" : client.email,
@@ -28,7 +26,7 @@ class Auth():
 				"ClearBlade-SystemSecret" : client.systemSecret,
 				"ClearBlade-SystemKey" : client.systemKey
 			}
-			resp = requests.post(self.CB_ADDR + "/api/v/1/user/auth", data=json.dumps(payload), headers=headers)		
+			resp = requests.post(client.platform + "/api/v/1/user/auth", data=json.dumps(payload), headers=headers)		
 			print resp.text
 			try:
 				resp = json.loads(resp.text)
@@ -37,7 +35,7 @@ class Auth():
 				print "JSON Decode has failed because of error : ", resp.text	
 
 		if isinstance(client, Client.DevClient) == True:
-			resp = requests.post(self.CB_ADDR + "/admin/auth", data=json.dumps(payload))		
+			resp = requests.post(client.platform + "/admin/auth", data=json.dumps(payload))		
 			print resp.text
 			try:
 				resp = json.loads(resp.text)
@@ -49,17 +47,17 @@ class Auth():
 		headers = {
 			"Content-Type" : "application/json",
 			"Accept" : "application/json",
-			"ClearBlade-SystemSecret" : UserClient.systemSecret,
-			"ClearBlade-SystemKey" : UserClient.systemKey
+			"ClearBlade-SystemSecret" : client.systemSecret,
+			"ClearBlade-SystemKey" : client.systemKey
 		}
-		resp = requests.post(self.CB_ADDR + "/api/v/1/user/anon", headers=headers)
+		resp = requests.post(client.platform + "/api/v/1/user/anon", headers=headers)
 		print resp.text
 
 	def RegisterUser(self, username, password, client):
 		if client.UserToken == "":
 			print "Must be logged in to create user"
 			exit(1)
-		endpoint = self.CB_ADDR + "/api/v/1/user/reg"
+		endpoint = client.platform + "/api/v/1/user/reg"
 		payload = {
 			"email" : username,
 			"password" : password
@@ -81,7 +79,7 @@ class Auth():
 		if client.DevToken == "":
 			print "Must be logged in to create user"
 			exit(1)
-		endpoint = self.CB_ADDR + "/admin/user/" + client.systemKey
+		endpoint = client.platform + "/admin/user/" + client.systemKey
 		payload = {
 			"email" : username,
 			"password" : password
