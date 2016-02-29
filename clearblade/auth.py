@@ -30,14 +30,20 @@ class Auth():
 			}
 			resp = requests.post(self.CB_ADDR + "/api/v/1/user/auth", data=json.dumps(payload), headers=headers)		
 			print resp.text
-			resp = json.loads(resp.text)
-			client.UserToken = str(resp['user_token'])	
+			try:
+				resp = json.loads(resp.text)
+				client.UserToken = str(resp['user_token'])	
+			except ValueError:
+				print "JSON Decode has failed because of error : ", resp.text	
 
 		if isinstance(client, Client.DevClient) == True:
 			resp = requests.post(self.CB_ADDR + "/admin/auth", data=json.dumps(payload))		
 			print resp.text
-			resp = json.loads(resp.text)
-			client.DevToken = str(resp['dev_token'])					
+			try:
+				resp = json.loads(resp.text)
+				client.DevToken = str(resp['dev_token'])					
+			except ValueError:
+				print "JSON Decode has failed because of error : ", resp.text	
 			
 	def authAnon(self, client):
 		headers = {
@@ -65,8 +71,11 @@ class Auth():
 		}	
 		resp = requests.post(endpoint, data=json.dumps(payload), headers=headers)
 		print resp.text
-		resp = json.loads(resp.text)
-		client.UserToken = str(resp['user_id'])
+		try:
+			resp = json.loads(resp.text)
+			client.UserToken = str(resp['user_id'])
+		except ValueError:
+				print "JSON Decode has failed because of error : ", resp.text			
 
 	def RegisterDevUser(self, username, password, client):
 		if client.DevToken == "":
@@ -84,5 +93,13 @@ class Auth():
 		}	
 		resp = requests.post(endpoint, data=json.dumps(payload), headers=headers)
 		print resp.text
-		resp = json.loads(resp.text)	
-		client.DevToken = str(resp['user_id'])	
+		try:
+			resp = json.loads(resp.text)	
+			client.DevToken = str(resp['user_id'])	
+		except ValueError:
+				print "JSON Decode has failed because of error : ", resp.text	
+
+
+devClient = Client.DevClient("eeccc5eb0af8d5e6b5a4c094a474", "EECCC5EB0A90EBC6E09CEE95E65D", "roha@clearblade.com", "rohanbendre")
+auth = Auth()
+auth.Authenticate(devClient)
