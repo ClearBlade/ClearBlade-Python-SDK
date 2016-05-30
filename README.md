@@ -13,9 +13,9 @@ Sample programs are provided in SampleCodes folder
 Connection Codes
 ================
 
-0	Connection Accepted
-1	Connection Refused, unacceptable protocol version
-2	Connection Refused, identifier rejected
-3	Connection Refused, Server unavailable
-4	Connection Refused, bad user name or password
-5	Connection Refused, not authorized
+0 Connection Accepted
+1 Connection Refused, unacceptable protocol version
+2 Connection Refused, identifier rejected
+3 Connection Refused, Server unavailable
+4 Connection Refused, bad user name or password
+5 Connection Refused, not authorized
