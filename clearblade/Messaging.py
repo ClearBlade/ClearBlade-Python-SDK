@@ -10,6 +10,7 @@ from urlparse import urlparse
 
 class Messaging():
 	CB_MSG_ADDR = ""
+	response = 0
 	def __init__(self, clientType):
 		self.client = ""
 		self.rc = 0
@@ -22,31 +23,52 @@ class Messaging():
 		if isinstance(self.clientType, Client.DevClient):
 			print self.clientType.email	
 
-	def InitializeMQTT(self, timeout):
+	def InitializeMQTT(self, **keyword_parameters):
 		if isinstance(self.clientType, Client.UserClient):
-			self.client = mqtt.Client(client_id=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(23)), protocol=mqtt.MQTTv31)
+			self.client = mqtt.Client(client_id=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(23)), protocol=mqtt.MQTTv311)
 			self.client.username_pw_set(self.clientType.UserToken, self.clientType.systemKey)
 			print self.clientType.UserToken
 		if isinstance(self.clientType, Client.DevClient):
-			self.client = mqtt.Client(client_id=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(23)), protocol=mqtt.MQTTv31)
+			self.client = mqtt.Client(client_id=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(23)), protocol=mqtt.MQTTv311)
 			self.client.username_pw_set(self.clientType.DevToken, self.clientType.systemKey)
 		
 		def on_connect(client, flag, userdata, rc):
-			if rc == 0:
+			self.response = 1
+			self.rc = rc
+			if self.rc == 0:
+				print flag
+				print userdata
+				print client
 				print "Connected successfully "
 			else:
-				print "Error in connection with code ", rc	
-			self.rc = rc
+				print "Here.. Error in connection with code ", rc
+
+		def on_log(client, userdata, level, buf):
+			print "Inside log : ", buf	
 
 		self.client.on_connect = on_connect
+		self.on_log = on_log
 		
-		self.client.connect(self.CB_MSG_ADDR, 1883, timeout)
-		self.client.loop_start()
+		if ('keep_alive' in keyword_parameters):
+			print "Timeout is : ", keyword_parameters['keep_alive']
+			self.client.connect(self.CB_MSG_ADDR, 1883, keyword_parameters['keep_alive'])
+			self.client.loop_start()
+		else:	
+			print "Attempting to connect now"
+			self.client.connect_async(self.CB_MSG_ADDR, 1883, keepalive=30)
+			self.client.loop_start()
 
+		while(self.response !=1):
+			continue
+
+		if self.rc > 0:
+			self.client.loop_stop()
+			return self.rc		
+		
 	def publishMessage(self, topic, data, qos):	
 		if isinstance(self.clientType, Client.UserClient) or isinstance(self.clientType, Client.DevClient):
 			def on_publish(client, userdata, mid):
-				print "Published", mid
+				print "Published", client
 
 			self.client.on_publish = on_publish	
 			self.client.publish(topic, data, qos)

@@ -26,6 +26,7 @@ class Auth():
 				"ClearBlade-SystemSecret" : client.systemSecret,
 				"ClearBlade-SystemKey" : client.systemKey
 			}
+			print client.platform
 			resp = requests.post(client.platform + "/api/v/1/user/auth", data=json.dumps(payload), headers=headers)		
 			print resp.text
 			try:
