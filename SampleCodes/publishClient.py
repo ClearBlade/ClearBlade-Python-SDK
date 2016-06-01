@@ -6,7 +6,7 @@ import time
 
 auth = auth.Auth()
 
-userClient = Client.UserClient("c6d3afec0aa2c4a9dddae6fc899e01", "C6D3AFEC0AC2A59AF5B8FACB8CAE01", "test@clearblade.com", "clearblade", "https://platform.clearblade.com") 
+userClient = Client.UserClient("cecdeef40a98c1e1cb87c58dad58", "CECDEEF40A869A818AC6D9D4C21F", "parent@acme.com", "edge", "http://localhost") 
 # userClient = Client.UserClient("eeccc5eb0af8d5e6b5a4c094a474", "EECCC5EB0A90EBC6E09CEE95E65D", "test@clearblade.com", "rohanbendre", "https://rtp.clearblade.com")
 auth.Authenticate(userClient)
 
@@ -38,11 +38,11 @@ message.InitializeMQTT()
 
 i=0
 time.sleep(5)
-while i<20:
+while i<100:
 	message.publishMessage("weather", "Sending message" + str(i+1), 1)
 	time.sleep(1)
 	i = i+1
 	if i == 10:
-		print "Waiting 2 minutes"
-		time.sleep(60)
+		print "Waiting 2 seconds"
+		time.sleep(2)
 	message.publishMessage("weather", "Sending message" + str(i+1), 1)	

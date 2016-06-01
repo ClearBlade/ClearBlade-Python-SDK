@@ -6,6 +6,7 @@ import UserClient
 import math
 import random
 import string
+import auth
 from urlparse import urlparse
 
 class Messaging():
@@ -42,6 +43,9 @@ class Messaging():
 				print "Connected successfully "
 			else:
 				print "Here.. Error in connection with code ", rc
+				global auth = auth.Auth()
+				auth.Authenticate(Client.UserClient)
+				print "User Authenticated"
 
 		def on_log(client, userdata, level, buf):
 			print "Inside log : ", buf	
