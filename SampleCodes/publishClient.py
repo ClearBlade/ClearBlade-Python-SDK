@@ -14,35 +14,13 @@ message = Messaging.Messaging(userClient)
 message.printValue()
 message.InitializeMQTT()
 
-
-# message.publishMessage("weather", "Sending message", 1)
-# message.publishMessage("weather", "Sending message", 1)
-# message.publishMessage("weather", "Sending message", 1)
-# message.publishMessage("weather", "Sending message", 1)
-# message.publishMessage("weather", "Sending message", 1)
-# time.sleep(10)
-# message.disconnect()
-# time.sleep(15)
-# message.InitializeMQTT()
-# message.publishMessage("weather", "Sending message", 1)
-# message.publishMessage("weather", "Sending message", 1)
-# message.publishMessage("weather", "Sending message", 1)
-# message.publishMessage("weather", "Sending message", 1)
-# message.publishMessage("weather", "Sending message", 1)
-# time.sleep(45)
-# message.publishMessage("weather", "Sending message", 1)
-# message.publishMessage("weather", "Sending message", 1)
-# message.publishMessage("weather", "Sending message", 1)
-# time.sleep(45)
-# message.publishMessage("weather", "Sending message", 1)
-
 i=0
 time.sleep(5)
 while i<100:
-	message.publishMessage("zmq/subscribe", "Sending message" + str(i+1), 1)
+	message.publishMessage("weather", "Sending message" + str(i+1), 1)
 	time.sleep(1)
 	i = i+1
 	if i == 10:
 		print "Waiting 2 seconds"
 		time.sleep(2)
-	message.publishMessage("zmq/subscribe", "Sending message" + str(i+1), 1)	
+	message.publishMessage("weather", "Sending message" + str(i+1), 1)	
