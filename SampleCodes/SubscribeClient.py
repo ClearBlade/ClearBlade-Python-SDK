@@ -6,20 +6,29 @@ import time
 
 auth = auth.Auth()
 
-userClient = Client.UserClient("SYSKEY", "SYSSECRET", "USER_EMAIL", "PASSWORD", "PLATFORM URL")
+userClient = Client.UserClient("cecdeef40a98c1e1cb87c58dad58", "CECDEEF40A869A818AC6D9D4C21F", "parent@acme.com", "edge", "http://localhost") 
+
+# userClient = Client.UserClient("eeccc5eb0af8d5e6b5a4c094a474", "EECCC5EB0A90EBC6E09CEE95E65D", "register@clearblade.com", "clearblade", "https://rtp.clearblade.com")
 auth.Authenticate(userClient)
+
 
 message = Messaging.Messaging(userClient)
 message.printValue()
-message.InitializeMQTT(60)
+status = message.InitializeMQTT(keep_alive=60)
 
-message.subscribe("weather", 1)
-time.sleep(5)
-count = 0
-while count < 100:
-	count = count + 1
-	time.sleep(1)
-	if count == 50:
-		print "Waiting 2 minutes"
-		time.sleep(90)
-		message.subscribe("weather", 1)
+print status
+if status == 4:
+	print "Error in connection.. Aborting!!"
+	exit(1)
+
+time.sleep(1)
+def onMessageCallback(client, obj, msg):
+	print "Payload: "+msg.payload
+
+message.subscribe("weather", 1, onMessageCallback)
+while True:
+	pass
+
+
+
+
