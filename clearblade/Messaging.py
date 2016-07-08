@@ -18,7 +18,7 @@ class Messaging():
 		self.client = ""
 		self.rc = 0
 		self.clientType = clientType
-		self.CB_MSG_ADDR = urlparse(clientType.platform).netloc
+		self.CB_MSG_ADDR, seperator, port = urlparse(clientType.platform).netloc.rpartition(':')
 		self.auth = auth.Auth()
 
 	def printValue(self):
