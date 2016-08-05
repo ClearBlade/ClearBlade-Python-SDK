@@ -26,9 +26,8 @@ class Auth():
 				"ClearBlade-SystemSecret" : client.systemSecret,
 				"ClearBlade-SystemKey" : client.systemKey
 			}
-			print client.platform
+			print "Connecting to : "+client.platform
 			resp = requests.post(client.platform + "/api/v/1/user/auth", data=json.dumps(payload), headers=headers)		
-			print resp.text
 			try:
 				resp = json.loads(resp.text)
 				client.UserToken = str(resp['user_token'])	
@@ -37,7 +36,6 @@ class Auth():
 
 		if isinstance(client, Client.DevClient) == True:
 			resp = requests.post(client.platform + "/admin/auth", data=json.dumps(payload))		
-			print resp.text
 			try:
 				resp = json.loads(resp.text)
 				client.DevToken = str(resp['dev_token'])					
@@ -52,7 +50,6 @@ class Auth():
 			"ClearBlade-SystemKey" : client.systemKey
 		}
 		resp = requests.post(client.platform + "/api/v/1/user/anon", headers=headers)
-		print resp.text
 
 	def RegisterUser(self, username, password, client):
 		if client.UserToken == "":
@@ -69,7 +66,6 @@ class Auth():
 			"ClearBlade-UserToken" : client.UserToken
 		}	
 		resp = requests.post(endpoint, data=json.dumps(payload), headers=headers)
-		print resp.text
 		try:
 			resp = json.loads(resp.text)
 			client.UserToken = str(resp['user_id'])
@@ -91,7 +87,6 @@ class Auth():
 			"ClearBlade-DevToken" : client.DevToken
 		}	
 		resp = requests.post(endpoint, data=json.dumps(payload), headers=headers)
-		print resp.text
 		try:
 			resp = json.loads(resp.text)	
 			client.DevToken = str(resp['user_id'])	

@@ -14,6 +14,7 @@ class Messaging():
 	response = 0
 	keep_alive = 30
 	subscribeDict = dict()
+	onMessageCallback = object
 	def __init__(self, clientType):
 		self.client = ""
 		self.rc = 0
@@ -24,16 +25,15 @@ class Messaging():
 
 	def printValue(self):
 		if isinstance(self.clientType, Client.UserClient):
-			print self.clientType.email
+			print "User : "+self.clientType.email
 		if isinstance(self.clientType, Client.DevClient):
-			print self.clientType.email	
+			print "Developer : "+self.clientType.email	
 
 	def InitializeMQTT(self, **keyword_parameters):
-		print("Inside initialize")
+		print("Initializing")
 		if isinstance(self.clientType, Client.UserClient):
 			self.client = mqtt.Client(client_id=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(23)), clean_session=True, userdata=None, protocol=mqtt.MQTTv311)
 			self.client.username_pw_set(self.clientType.UserToken, self.clientType.systemKey)
-			print self.clientType.UserToken
 		if isinstance(self.clientType, Client.DevClient):
 			self.client = mqtt.Client(client_id=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(23)), protocol=mqtt.MQTTv311)
 			self.client.username_pw_set(self.clientType.DevToken, self.clientType.systemKey)
@@ -42,15 +42,10 @@ class Messaging():
 			self.response = 1
 			self.rc = rc
 			if self.rc == 0:
-				print flag
-				print userdata
-				print client
 				print "Connected successfully "
 
 				for topic, qos in self.subscribeDict.iteritems():
-					def onMessageCallback(client, obj, msg):
-						print "DSD"+msg.payload
-					self.subscribeNew(topic,qos,onMessageCallback)
+					self.subscribeNew(topic,qos)
 					print "SUBSCRIBING "+topic+", "+str(qos)
 			else:
 				print "Error in connection with code ", str(rc)+"... Trying to reconnect"
@@ -82,7 +77,7 @@ class Messaging():
 	def publishMessage(self, topic, data, qos):	
 		if isinstance(self.clientType, Client.UserClient) or isinstance(self.clientType, Client.DevClient):
 			def on_publish(client, userdata, mid):
-				print "Published", client
+				print "Published ", data
 
 			self.client.on_publish = on_publish	
 			self.client.publish(topic, data, qos)
@@ -90,16 +85,18 @@ class Messaging():
 	def subscribe(self, topic, qos, onMessageCallback):
 		if isinstance(self.clientType, Client.UserClient) or isinstance(self.clientType, Client.DevClient):
 			if topic in self.subscribeDict:
+				self.onMessageCallback = onMessageCallback
 				print "Already subscribed to the topic"
 			else:
 				self.subscribeDict[topic] = qos
-			thread.start_new_thread(self.keepSubscribed, (topic,qos,onMessageCallback))
+				self.onMessageCallback = onMessageCallback
+			thread.start_new_thread(self.keepSubscribed, (topic,qos))
 
-	def subscribeNew(self, topic, qos, onMessageCallback):
+	def subscribeNew(self, topic, qos):
 		if isinstance(self.clientType, Client.UserClient) or isinstance(self.clientType, Client.DevClient):
-			thread.start_new_thread(self.keepSubscribed, (topic,qos,onMessageCallback))		
+			thread.start_new_thread(self.keepSubscribed, (topic,qos))		
 		
-	def keepSubscribed(self,topic,qos,onMessageCallback):
+	def keepSubscribed(self,topic,qos):
 
 		def on_subscribe(client, userdata, mid, gqos):
 			print "Subscribed"
@@ -109,11 +106,10 @@ class Messaging():
 
 		self.client.subscribe(topic, qos)
 		self.client.on_subscribe = on_subscribe
-		self.client.on_message = onMessageCallback
+		self.client.on_message = self.onMessageCallback
 
 	def unsubscribe(self, topic):
 		if isinstance(self.clientType, Client.UserClient) or isinstance(self.clientType, Client.DevClient):
-			print("Inside unsubscribed")
 			self.client.unsubscribe(topic)
 			self.subscribeDict.pop(topic, None)
 			def on_unsubscribe(client, userdata, mid):
@@ -129,19 +125,13 @@ class Messaging():
 			self.client.loop_stop()
 
 	def reconnectFunction(self):
-		print("Trying to reconnect")
-		#userClient = Client.UserClient("cecdeef40a98c1e1cb87c58dad58", "CECDEEF40A869A818AC6D9D4C21F", "parent@acme.com", "edge", "http://localhost") 
+		print("Attempting to reconnect")
 		userClient = self.clientType
 		self.auth.Authenticate(userClient)
 		self.clientType = userClient
 		if isinstance(self.clientType, Client.UserClient):
-			#self.client = mqtt.Client(client_id=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(23)), clean_session=True, userdata=None, protocol=mqtt.MQTTv311)
-			#self.client.reinitialise(client_id=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(23)), clean_session=True, userdata=None)
 			self.client.disconnect()
 			self.client.username_pw_set(self.clientType.UserToken, self.clientType.systemKey)
-			#print "###"+self.clientType.UserToken+"###"
-			#print self.clientType.systemKey
-			#self.client.connect(self.CB_MSG_ADDR, 1883, self.keep_alive)
 			self.client.reconnect()
 			self.client.loop_start()
 			print "reinitialised"
@@ -150,9 +140,6 @@ class Messaging():
 			self.client.username_pw_set(self.clientType.DevToken, self.clientType.systemKey)
 			self.client.disconnect()
 			self.client.username_pw_set(self.clientType.UserToken, self.clientType.systemKey)
-			#print "###"+self.clientType.UserToken+"###"
-			#print self.clientType.systemKey
-			#self.client.connect(self.CB_MSG_ADDR, 1883, self.keep_alive)
 			self.client.reconnect()
 			self.client.loop_start()
 			print "reinitialised"
