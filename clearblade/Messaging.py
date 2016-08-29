@@ -1,5 +1,4 @@
 import paho.mqtt.client as mqtt
-import thread
 import time
 import Client
 import UserClient 
@@ -11,137 +10,140 @@ from urlparse import urlparse
 
 class Messaging():
 	CB_MSG_ADDR = ""
-	response = 0
 	keep_alive = 30
 	subscribeDict = dict()
+        onMessageCallback = None
+        onUnsubscribeCallback = None
+        onDisconnectCallback = None
+        onPublishCallback = None
+        onSubscribeCallback = None
+        
 	def __init__(self, clientType):
 		self.client = ""
-		self.rc = 0
 		self.clientType = clientType
-		self.CB_MSG_ADDR = urlparse(clientType.platform).netloc
+		self.CB_MSG_ADDR = urlparse(clientType.platform).netloc.split(':')
+		self.CB_MSG_ADDR = self.CB_MSG_ADDR[0]
 		self.auth = auth.Auth()
 
 	def printValue(self):
 		if isinstance(self.clientType, Client.UserClient):
-			print self.clientType.email
+			print "User : "+self.clientType.email
 		if isinstance(self.clientType, Client.DevClient):
-			print self.clientType.email	
+			print "Developer : "+self.clientType.email	
 
 	def InitializeMQTT(self, **keyword_parameters):
-		print("Inside initialize")
 		if isinstance(self.clientType, Client.UserClient):
 			self.client = mqtt.Client(client_id=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(23)), clean_session=True, userdata=None, protocol=mqtt.MQTTv311)
 			self.client.username_pw_set(self.clientType.UserToken, self.clientType.systemKey)
-			print self.clientType.UserToken
 		if isinstance(self.clientType, Client.DevClient):
 			self.client = mqtt.Client(client_id=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(23)), protocol=mqtt.MQTTv311)
 			self.client.username_pw_set(self.clientType.DevToken, self.clientType.systemKey)
-		
-		def on_connect(client, flag, userdata, rc):
-			self.response = 1
-			self.rc = rc
-			if self.rc == 0:
-				print flag
-				print userdata
-				print client
-				print "Connected successfully "
-
-				for topic, qos in self.subscribeDict.iteritems():
-					self.subscribeNew(topic,qos)
-					print "SUBSCRIBING "+topic+", "+str(qos)
-			else:
-				print "Error in connection with code ", str(rc)+"... Trying to reconnect"
-				self.reconnectFunction()
-			
-
-		def on_log(client, userdata, level, buf):
-			print "Inside log : ", buf	
-
-		self.client.on_connect = on_connect
-		self.on_log = on_log
 
 		if ('keep_alive' in keyword_parameters):
-			print "Timeout is : ", keyword_parameters['keep_alive']
-			self.client.connect(self.CB_MSG_ADDR, 1883, keyword_parameters['keep_alive'])
-			self.client.loop_start()
-		else:	
-			print "Attempting to connect now"
-			self.client.connect_async(self.CB_MSG_ADDR, 1883, keepalive=30)
-			self.client.loop_start()
+                        self.keep_alive = keyword_parameters['keep_alive']
+                else:
+                        #default
+                        self.keep_alive = 30
 
-		while(self.response !=1):
-			continue
+                def resetOnRedial(client,flag,userdata,rc):
+                        if rc == 0:
+                                #we actually did it!
+                                #now we should reset any callbacks and various subscriptions
+                                if self.onMessageCallback is not None:
+                                        self.client.on_message = self.onMessageCallback
+                                if self.onUnsubscribeCallback is not None:
+                                        self.client.on_unsubscribe = self.onUnsubscribeCallback        
+                                if self.onDisconnectCallback is not None:
+                                        self.client.on_disconnect = self.onDisconnectCallback
+                                if self.onPublishCallback is not None:
+                                        self.client.on_publish = self.onPublishCallback
+                                if self.onSubscribeCallback is not None:
+                                        self.client.on_subscribe = self.onSubscribeCallback
+                                for topic,qos in self.subscribeDict.iteritems():
+                                        self.client.subscribe(topic,qos)
+                        else:
+                                self.resetClient()
 
-		if self.rc > 0:
-			self.client.loop_stop()
-			return self.rc		
+                #we're supposed to attempt to reauth if connect fails
+                self.client.on_connect = resetOnRedial
+                self.client.connect_async(self.CB_MSG_ADDR, 1883, keepalive=self.keep_alive)
+                self.client.loop_start()
 		
-	def publishMessage(self, topic, data, qos):	
+	def publishMessage(self, topic, data, qos, cb=None):	
 		if isinstance(self.clientType, Client.UserClient) or isinstance(self.clientType, Client.DevClient):
-			def on_publish(client, userdata, mid):
-				print "Published", client
-
-			self.client.on_publish = on_publish	
+                        if cb is not None:
+                                self.setOnPublishCallback(cb)
 			self.client.publish(topic, data, qos)
 
-	def subscribe(self, topic, qos):
+	def subscribe(self, topic, qos, onMessageCallback=None):
 		if isinstance(self.clientType, Client.UserClient) or isinstance(self.clientType, Client.DevClient):
+                        if onMessageCallback is not None:
+                                self.setOnMessageCallback(onMessageCallback)
+                                
 			if topic in self.subscribeDict:
-				print "Already subscribed to the topic"
+                                #not sure if raising an exception is the proper thing here
+                                #this method didn't return anything previously
+                                raise Exception("Already subscribed on topic")
 			else:
 				self.subscribeDict[topic] = qos
-			thread.start_new_thread(self.keepSubscribed, (topic,qos))
+                                self.client.subscribe(topic,qos)
 
-	def subscribeNew(self, topic, qos):
+
+        def setOnMessageCallback(self, onMessageCallback):
+                """Sets the "on_message" callback. The method is called every time a message is received, no matter the topic. For more information see the paho mqtt documentation"""
+                self.onMessageCallback = onMessageCallback
+                self.client.on_message = self.onMessageCallback
+        def setOnPublishCallback(self,cb):
+                self.onPublishCallback = cb
+                self.client.on_publish = self.onPublishcallback
+        def setOnSubscribeCallback(self, onSubscribeCallback):
+                self.onSubscribeCallback = onSubscribeCallback
+                self.client.on_subscribe = self.onSubscribeCallback
+        def setOnUnsubscribeCallback(self, onUnsubscribeCallback):
+                """Sets the "on_unsubscribe" callback. Called when unsubscribe is called"""
+                self.onUnsubscribeCallback = onUnsubscribeCallback
+                self.client.on_onunsubscribe = onUnsubscribeCallback
+
+        def setOnDisconnectCallback(self, onDisconnectCallback):
+                """Sets the "on_disconnect" callback. By default it is set to reauthenticate, redial, and resubscribe, unless "disconnect" is specifically called"""
+                self.onDisconnectCallback = onDisconnectCallback
+                self.client.on_disconnect = onDisconnectCallback
+
+        def setOnConnectCallback(self, onConnectCallback):
+                self.onConnectCallback = onConnectCallback
+                self.client.on_connect = onConnectCallback
+                
+        def subscribeNew(self, topic, qos):
 		if isinstance(self.clientType, Client.UserClient) or isinstance(self.clientType, Client.DevClient):
-			thread.start_new_thread(self.keepSubscribed, (topic,qos))		
-		
-	def keepSubscribed(self,topic,qos):
+                        self.subscribe(topic,qos)
 
-		def on_subscribe(client, userdata, mid, gqos):
-			print "Subscribed"
-
-		def on_message(client, obj,msg):
-			print msg.payload
-
-		self.client.subscribe(topic, qos)
-		self.client.on_subscribe = on_subscribe
-		self.client.on_message = on_message
-
-	def unsubscribe(self, topic):
+        #preserving for backwards compat
+        #a normal subscribe
+        def keepSubscribed(self,topic,qos):
+                self.subscribe(topic,qos)
+        
+	def unsubscribe(self, topic, onUnsubscribeCallback=None):
 		if isinstance(self.clientType, Client.UserClient) or isinstance(self.clientType, Client.DevClient):
-			print("Inside unsubscribed")
-			self.client.unsubscribe(topic)
+                        if onUnsubscribeCallback is not None:
+                                self.setOnSubscribeCallback(onUnsubscribeCallback)
+                        #should we check for unsubscribe in the dict?
+                        self.client.unsubscribe(topic)
 			self.subscribeDict.pop(topic, None)
-			def on_unsubscribe(client, userdata, mid):
-				print "Unsubscribed ",mid
-			self.client.on_unsubscribe = on_unsubscribe
 
-	def disconnect(self):
+	def disconnect(self,onDisconnectCallback=None):
 		if isinstance(self.clientType, Client.UserClient) or isinstance(self.clientType, Client.DevClient):
-			def on_disconnect(client, userdata, rc):
-				print "Disconnected"	
+                        if onDisconnectCallback is not None:
+                                self.setOnDisconnectCallback(onDisconnectCallback)
 			self.client.disconnect()
-			self.client.on_disconnect = on_disconnect
 			self.client.loop_stop()
 
-	def reconnectFunction(self):
-		print("Inside reconnect function")
-		#userClient = Client.UserClient("cecdeef40a98c1e1cb87c58dad58", "CECDEEF40A869A818AC6D9D4C21F", "parent@acme.com", "edge", "http://localhost") 
-		userClient = self.clientType
-		self.auth.Authenticate(userClient)
-		self.clientType = userClient
-		if isinstance(self.clientType, Client.UserClient):
-			#self.client = mqtt.Client(client_id=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(23)), clean_session=True, userdata=None, protocol=mqtt.MQTTv311)
-			#self.client.reinitialise(client_id=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(23)), clean_session=True, userdata=None)
-			self.client.disconnect()
-			self.client.username_pw_set(self.clientType.UserToken, self.clientType.systemKey)
-			#print "###"+self.clientType.UserToken+"###"
-			#print self.clientType.systemKey
-			#self.client.connect(self.CB_MSG_ADDR, 1883, self.keep_alive)
-			self.client.reconnect()
-			self.client.loop_start()
-			print "reinitialise"
-		if isinstance(self.clientType, Client.DevClient):
-			self.client = mqtt.Client(client_id=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(23)), protocol=mqtt.MQTTv311)
-			self.client.username_pw_set(self.clientType.DevToken, self.clientType.systemKey)
+
+        def resetClient(self):
+                #not sure if required?
+                #previous behavior is to reauthenticate and try again if the connect fails
+                self.auth.Authenticate(self.clientType)
+                if isinstance(self.clientType, Client.UserClient):
+                        self.client.username_pw_set(self.clientType.UserToken, self.clientType.systemKey)
+                elif isinstance(self.clientType,Client.DevClient):
+                        self.client.username_pw_set(self.clientType.DevToken, self.clientType.systemKey)
+                self.client.connect_async(self.CB_MSG_ADDR, 1883, keepalive=self.keep_alive)
