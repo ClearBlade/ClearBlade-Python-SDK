@@ -1,5 +1,6 @@
 import paho.mqtt.client as mqtt
 import time
+import sys
 import Client
 import UserClient 
 import math
@@ -73,7 +74,11 @@ class Messaging():
 		if isinstance(self.clientType, Client.UserClient) or isinstance(self.clientType, Client.DevClient):
                         if cb is not None:
                                 self.setOnPublishCallback(cb)
-			self.client.publish(topic, data, qos)
+
+                        try:
+                                self.client.publish(topic, data, qos)
+                        except:
+                                print sys.exc_info
 
 	def subscribe(self, topic, qos, onMessageCallback=None):
 		if isinstance(self.clientType, Client.UserClient) or isinstance(self.clientType, Client.DevClient):
@@ -95,7 +100,7 @@ class Messaging():
                 self.client.on_message = self.onMessageCallback
         def setOnPublishCallback(self,cb):
                 self.onPublishCallback = cb
-                self.client.on_publish = self.onPublishcallback
+                self.client.on_publish = self.onPublishCallback
         def setOnSubscribeCallback(self, onSubscribeCallback):
                 self.onSubscribeCallback = onSubscribeCallback
                 self.client.on_subscribe = self.onSubscribeCallback

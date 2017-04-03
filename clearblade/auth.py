@@ -14,12 +14,11 @@ import time
 class Auth(): 
 
 	def Authenticate(self, client):
-		payload = {
-			"email" : client.email,
-			"password" : client.password
-		}
-
 		if isinstance(client, Client.UserClient) == True:
+                        payload = {
+                                "email" : client.email,
+                                "password" : client.password
+                        }
 			headers = {
 				"Content-Type" : "application/json",
 				"Accept" : "application/json",
@@ -35,10 +34,15 @@ class Auth():
 				print "JSON Decode has failed because of error : ", resp.text	
 
 		if isinstance(client, Client.DevClient) == True:
-			resp = requests.post(client.platform + "/admin/auth", data=json.dumps(payload))		
+                        payload = {
+                                "deviceName" : client.email,
+                                "activeKey" : client.password
+                        }
+			resp = requests.post(client.platform + "/api/v/2/devices/" + client.systemKey + \
+                                             "/auth", data=json.dumps(payload))
 			try:
 				resp = json.loads(resp.text)
-				client.DevToken = str(resp['dev_token'])					
+				client.DevToken = str(resp['deviceToken'])					
 			except ValueError:
 				print "JSON Decode has failed because of error : ", resp.text	
 			
