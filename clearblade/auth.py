@@ -3,10 +3,7 @@ import urllib
 import json 
 import urlHelper
 import requests
-import UserClient
-import DevClient
 import Code
-
 import Client
 import Messaging
 import time 

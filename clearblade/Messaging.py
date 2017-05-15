@@ -2,7 +2,6 @@ import paho.mqtt.client as mqtt
 import time
 import sys
 import Client
-import UserClient 
 import math
 import random
 import string
@@ -39,14 +38,16 @@ class Messaging():
 		if isinstance(self.clientType, Client.DevClient):
 			self.client = mqtt.Client(client_id=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(23)), protocol=mqtt.MQTTv311)
 			self.client.username_pw_set(self.clientType.DevToken, self.clientType.systemKey)
-
-		if ('keep_alive' in keyword_parameters):
+                if isinstance(self.clientType, Client.DeviceClient):
+                        self.client = mqtt.Client(client_id=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(23)), protocol=mqtt.MQTTv311)
+                        self.client.username_pw_set(self.clientType.DeviceToken, self.clientType.systemKey)
+                if ('keep_alive' in keyword_parameters):
                         self.keep_alive = keyword_parameters['keep_alive']
                 else:
                         #default
                         self.keep_alive = 30
 
-                def resetOnRedial(client,flag,userdata,rc):
+                def resetOnRedial(client,userdata,rc):
                         if rc == 0:
                                 #we actually did it!
                                 #now we should reset any callbacks and various subscriptions
@@ -71,7 +72,7 @@ class Messaging():
                 self.client.loop_start()
 		
 	def publishMessage(self, topic, data, qos, cb=None):	
-		if isinstance(self.clientType, Client.UserClient) or isinstance(self.clientType, Client.DevClient):
+		if isinstance(self.clientType, Client.UserClient) or isinstance(self.clientType, Client.DevClient) or isinstance(self.clientType, Client.DeviceClient):
                         if cb is not None:
                                 self.setOnPublishCallback(cb)
 
@@ -81,7 +82,7 @@ class Messaging():
                                 print sys.exc_info
 
 	def subscribe(self, topic, qos, onMessageCallback=None):
-		if isinstance(self.clientType, Client.UserClient) or isinstance(self.clientType, Client.DevClient):
+		if isinstance(self.clientType, Client.UserClient) or isinstance(self.clientType, Client.DevClient) or isinstance(self.clientType, Client.DeviceClient):
                         if onMessageCallback is not None:
                                 self.setOnMessageCallback(onMessageCallback)
                                 
@@ -119,7 +120,7 @@ class Messaging():
                 self.client.on_connect = onConnectCallback
                 
         def subscribeNew(self, topic, qos):
-		if isinstance(self.clientType, Client.UserClient) or isinstance(self.clientType, Client.DevClient):
+		if isinstance(self.clientType, Client.UserClient) or isinstance(self.clientType, Client.DevClient) or isinstance(self.clientType, Client.DeviceClient):
                         self.subscribe(topic,qos)
 
         #preserving for backwards compat
@@ -128,7 +129,7 @@ class Messaging():
                 self.subscribe(topic,qos)
         
 	def unsubscribe(self, topic, onUnsubscribeCallback=None):
-		if isinstance(self.clientType, Client.UserClient) or isinstance(self.clientType, Client.DevClient):
+		if isinstance(self.clientType, Client.UserClient) or isinstance(self.clientType, Client.DevClient) or isinstance(self.clientType, Client.DeviceClient):
                         if onUnsubscribeCallback is not None:
                                 self.setOnSubscribeCallback(onUnsubscribeCallback)
                         #should we check for unsubscribe in the dict?
@@ -136,7 +137,7 @@ class Messaging():
 			self.subscribeDict.pop(topic, None)
 
 	def disconnect(self,onDisconnectCallback=None):
-		if isinstance(self.clientType, Client.UserClient) or isinstance(self.clientType, Client.DevClient):
+		if isinstance(self.clientType, Client.UserClient) or isinstance(self.clientType, Client.DevClient) or isinstance(self.clientType, Client.DeviceClient):
                         if onDisconnectCallback is not None:
                                 self.setOnDisconnectCallback(onDisconnectCallback)
 			self.client.disconnect()
@@ -151,4 +152,6 @@ class Messaging():
                         self.client.username_pw_set(self.clientType.UserToken, self.clientType.systemKey)
                 elif isinstance(self.clientType,Client.DevClient):
                         self.client.username_pw_set(self.clientType.DevToken, self.clientType.systemKey)
+                elif isinstance(self.clientType, Client.DeviceClient):
+                        self.client.username_pw_set(self.clientType.DeviceToken, self.clientType.systemKey)
                 self.client.connect_async(self.CB_MSG_ADDR, 1883, keepalive=self.keep_alive)
