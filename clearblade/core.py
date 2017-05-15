@@ -1,6 +1,8 @@
 import restHelper
 import urllib
 import json
+import Client
+import requests
 
 class ClearBlade:
 	"""The class that creates all of the objects to interact with the ClearBlade Platform
@@ -21,29 +23,51 @@ class ClearBlade:
 class Collection:
 	"""The class that handles all collection-level operations
 	"""
-	def __init__(self, systemKey, systemSecret, collectionID, url='https://platform.clearblade.com'):
-		self.systemKey = systemKey
-		self.systemSecret = systemSecret
+	def __init__(self, client, collectionID):
+		self.client = client
 		self.collectionID = collectionID	
 		self.headers = {
-				'ClearBlade-AppKey': self.systemKey,
-				'ClearBlade-AppSecret': self.systemSecret,
-				'Content-Type': 'application/json'
-				}
-		self.url = url + '/api/' + self.collectionID
-		self.rh = restHelper.restHelper(self.url, self.headers)
+			'ClearBlade-SystemKey': self.client.systemKey,
+			'ClearBlade-SystemSecret': self.client.systemSecret,
+			'Content-Type': 'application/json'
+		}
+		if isinstance(self.client, Client.UserClient):
+			self.headers['ClearBlade-UserToken'] = self.client.UserToken
+		elif isinstance(self.client, Client.DevClient):
+			self.headers['ClearBlade-DevToken'] = self.client.DevToken
+		elif isinstance(self.client, Client.DeviceClient):
+			self.headers['ClearBlade-DeviceToken'] = self.client.DeviceToken
+		self.url = self.client.platform + '/api/v/1/data/' + self.collectionID
 
 	def fetch(self, query=None):
+		resp = None
 		if query:
-			return self.rh.get({'query':json.dumps(query)})
+			resp = requests.get(self.url, headers=self.headers, params={'query': json.dumps(query)})
 		else:
-			return self.rh.get()
+			resp = requests.get(self.url, headers=self.headers)
+		if resp.status_code == 200:
+			try:
+				resp = json.loads(resp.text)
+				return resp
+			except ValueError:
+				print("Failed to decode response JSON: {0}".format(resp.text))
+		else:
+			print("Request failed with status code: {0} and response text: {1}".format(resp.status_code, resp.text))
 
 	def create(self, data):
 		return self.rh.post(data)
 
 	def update(self, changes, query):
-		return self.rh.put({'query': query, '$set': changes})
+		resp = requests.put(self.url,  headers=self.headers, json={'query': query, '$set': changes})
+		print resp.request.body
+		if resp.status_code == 200:
+			try:
+				resp = json.loads(resp.text)
+				return resp
+			except ValueError:
+				print("Failed to decode response JSON: {0}".format(resp.text))
+		else:
+			print("Request failed with status code: {0} and response text: {1}".format(resp.status_code, resp.text))
 
 	def delete(self, query):
 		return self.rh.delete({'query': json.dumps(query)})

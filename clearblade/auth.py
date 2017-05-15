@@ -15,10 +15,10 @@ class Auth():
 
 	def Authenticate(self, client):
 		if isinstance(client, Client.UserClient) == True:
-                        payload = {
-                                "email" : client.email,
-                                "password" : client.password
-                        }
+			payload = {
+				"email" : client.email,
+				"password" : client.password
+			}
 			headers = {
 				"Content-Type" : "application/json",
 				"Accept" : "application/json",
@@ -32,17 +32,31 @@ class Auth():
 				client.UserToken = str(resp['user_token'])	
 			except ValueError:
 				print "JSON Decode has failed because of error : ", resp.text	
-
 		if isinstance(client, Client.DevClient) == True:
-                        payload = {
-                                "deviceName" : client.email,
-                                "activeKey" : client.password
-                        }
+			payload = {
+				"email": client.email,
+				"password": client.password
+			}
+			headers = {
+				"Content-Type": "application/json",
+				"Accept": "application/json"
+			}
+			resp = requests.post(client.platform + "/admin/auth", data=json.dumps(payload), headers=headers)
+			try:
+				resp = json.loads(resp.text)
+				client.DevToken = str(resp['dev_token'])
+			except ValueError:
+				print("JSON Decode has failed because of error: {0}".format(resp.text))
+		if isinstance(client, Client.DeviceClient) == True:
+			payload = {
+				"deviceName" : client.deviceName,
+				"activeKey" : client.activeKey
+			}
 			resp = requests.post(client.platform + "/api/v/2/devices/" + client.systemKey + \
                                              "/auth", data=json.dumps(payload))
 			try:
 				resp = json.loads(resp.text)
-				client.DevToken = str(resp['deviceToken'])					
+				client.DeviceToken = str(resp['deviceToken'])					
 			except ValueError:
 				print "JSON Decode has failed because of error : ", resp.text	
 			
