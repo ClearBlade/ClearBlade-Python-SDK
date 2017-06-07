@@ -1,9 +1,10 @@
 import paho.mqtt.client as mqtt
 import cbLogs
+import time
 
 
 class Messaging:
-    def __init__(self, user):
+    def __init__(self, user, port=1883, keepalive=30, url=""):
         # mqtt client
         self.__mqttc = mqtt.Client()
         self.__mqttc.username_pw_set(user.token, user.system.systemKey)
@@ -30,8 +31,13 @@ class Messaging:
         self.on_log = None
 
         # internal variables
-        self.__url = self.__parse_url(user.url)
-        self.__port = 1883  # TODO: change to be user setable
+        if url:
+            self.__url = self.__parse_url(url)
+        else:
+            self.__url = self.__parse_url(user.url)
+        self.__port = port
+        self.__keepalive = keepalive
+        self.__qos = 0
 
     def __parse_url(self, url):
         s = url.split("/api/v/1/user")[0]
@@ -53,32 +59,31 @@ class Messaging:
 
     def __connect_cb(self, client, userdata, flags, rc):
         if rc == 0:
-            cbLogs.info("Connected to MQTT broker at", self.__url, "port 1883.")
+            cbLogs.info("Connected to MQTT broker at", self.__url, "port", str(self.__port) + ".")
         elif rc == 1:
-            cbLogs.error("MQTT connection to", self.__url, "port 1883", "refused. Incorrect protocol version.")  # I should probably fix this
+            cbLogs.error("MQTT connection to", self.__url, "port", str(self.__port) + ".", "refused. Incorrect protocol version.")  # I should probably fix this
         elif rc == 2:
-            cbLogs.error("MQTT connection to", self.__url, "port 1883", "refused. Invalid client identifier.")
+            cbLogs.error("MQTT connection to", self.__url, "port", str(self.__port) + ".", "refused. Invalid client identifier.")
         elif rc == 3:
-            cbLogs.error("MQTT connection to", self.__url, "port 1883", "refused. Server unavailable.")
+            cbLogs.error("MQTT connection to", self.__url, "port", str(self.__port) + ".", "refused. Server unavailable.")
         elif rc == 4:
-            cbLogs.error("MQTT connection to", self.__url, "port 1883", "refused. Bad username or password.")
+            cbLogs.error("MQTT connection to", self.__url, "port", str(self.__port) + ".", "refused. Bad username or password.")
         elif rc == 5:
-            cbLogs.error("MQTT connection to", self.__url, "port 1883", "refused. Not authorized.")
+            cbLogs.error("MQTT connection to", self.__url, "port", str(self.__port) + ".", "refused. Not authorized.")
         else:
-            cbLogs.error("MQTT connection to", self.__url, "port 1883", "refused. Tell ClearBlade to update their SDK for this case. rc=" + rc)
+            cbLogs.error("MQTT connection to", self.__url, "port", str(self.__port) + ".", "refused. Tell ClearBlade to update their SDK for this case. rc=" + rc)
         if self.on_connect:
             self.on_connect(client, userdata, flags, rc)
 
     def __disconnect_cb(self, client, userdata, rc):
         if rc == 0:
-            cbLogs.info("Disconnected from MQTT broker at", self.__url, "port 1883.")
+            cbLogs.info("Disconnected from MQTT broker at", self.__url, "port", str(self.__port) + ".")
         else:
-            cbLogs.error("Unexpected disconnect from MQTT broker at", self.__url, "port 1883. Check your network.")
+            cbLogs.error("Unexpected disconnect from MQTT broker at", self.__url, "port", str(self.__port) + ". Check your network.")
         if self.on_disconnect:
             self.on_disconnect(client, userdata, rc)
 
     def __subscribe_cb(self, client, userdata, mid, granted_qos):
-        print granted_qos
         if self.on_subscribe:
             self.on_subscribe(client, userdata, mid, granted_qos)
 
@@ -99,10 +104,18 @@ class Messaging:
         if self.on_log:
             self.on_log(client, userdata, level, buf)
 
-    def start(self):
-        self.__mqttc.connect_async(self.__url, self.__port, 30)
+    def connect(self):
+        self.__mqttc.connect_async(self.__url, self.__port, self.__keepalive)
         self.__mqttc.loop_start()
+        time.sleep(1)  # subscribing will not work without this delay so I baked it in
 
-    def stop(self):
+    def disconnect(self):
         self.__mqttc.loop_stop()
         self.__mqttc.disconnect()
+
+    def subscribe(self, channel):
+        cbLogs.info("Subscribing to:", channel)
+        self.__mqttc.subscribe(channel, self.__qos)
+
+    def publish(self, channel, message):
+        self.__mqttc.publish(channel, message)
