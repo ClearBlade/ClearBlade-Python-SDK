@@ -65,5 +65,5 @@ class Collection():
         }
         return restcall.put(self.url, headers=self.headers, data=payload)
 
-    def deleteItems(self, query):  # TODO
-        pass
+    def deleteItems(self, query):
+        return restcall.delete(self.url, headers=self.headers, params={"query": json.dumps(query.filters)})

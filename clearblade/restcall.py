@@ -96,3 +96,25 @@ def put(url, headers={}, data={}, silent=False):
 
     # return successful response
     return resp
+
+
+def delete(url, headers={}, params={}, silent=False):
+    # try our request
+    try:
+        resp = requests.delete(url, headers=headers, params=params)
+    except ConnectionError:
+        cbLogs.error("Connection error. Check that", url, "is up and accepting requests.")
+        exit(-1)
+
+    # check for errors
+    if resp.status_code == 200:
+        try:
+            resp = json.loads(resp.text)
+        except ValueError:
+            resp = resp.text
+    elif not silent:  # some requests are meant to fail
+        panicmessage(resp, "DELETE", url, headers, params=params)
+        exit(-1)
+
+    # return successful response
+    return resp

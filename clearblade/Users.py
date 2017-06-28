@@ -17,7 +17,7 @@ def registerUser(system, authenticatedUser, email, password):
         return newUser
     except TypeError:
         cbLogs.error(email, "already exists as a user on this system.")
-        return None
+        exit(-1)
 
 
 class RegularUser(object):
