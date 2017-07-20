@@ -2,3 +2,4 @@
 *.swp
 build/
 clearblade/test.py
+*.DS_Store
