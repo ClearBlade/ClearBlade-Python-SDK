@@ -1,6 +1,6 @@
 import restcall
 import cbLogs
-import json
+import Devices
 
 
 def registerDev(fname, lname, org, email, password, url="https://platform.clearblade.com"):
@@ -66,48 +66,16 @@ class Developer:
     ###############
 
     def newDevice(self, system, name, enabled=True, type="", state="", active_key="", allow_certificate_auth=False, allow_key_auth=True, certificate="", description="", keys=""):
-        url = system.url + "/admin/devices/" + system.systemKey + "/" + name
-        data = {
-            "active_key": active_key,
-            "allow_certificate_auth": allow_certificate_auth,
-            "allow_key_auth": allow_key_auth,
-            "certificate": certificate,
-            "description": description,
-            "enabled": enabled,
-            "keys": keys,
-            "name": name,
-            "state": state,
-            "type": type
-        }
-        resp = restcall.post(url, headers=self.headers, data=data)
-        cbLogs.info("Successfully created", name, "as a device.")
-        return resp
+        return Devices.DEVnewDevice(self, system, name, enabled, type, state, active_key, allow_certificate_auth, allow_key_auth, certificate, description, keys)
 
     def getDevices(self, system, query=None):
-        if query:
-            params = {}
-            params["FILTERS"] = query.filters
-            params["SORT"] = query.sorting
-            params = {"query": json.dumps(params)}
-        else:
-            params = ""
-        url = system.url + "/api/v/2/devices/" + system.systemKey
-        resp = restcall.get(url, headers=self.headers, params=params)
-        return resp
+        return Devices.DEVgetDevices(self, system, query)
 
     def getDevice(self, system, name):
-        url = system.url + "/api/v/2/devices/" + system.systemKey + "/" + name
-        resp = restcall.get(url, headers=self.headers)
-        return resp
+        return Devices.DEVgetDevice(self, system, name)
 
     def updateDevice(self, system, name, updates):
-        url = system.url + "/api/v/2/devices/" + system.systemKey + "/" + name
-        resp = restcall.put(url, headers=self.headers, data=updates)
-        cbLogs.info("Successfully updated device:", name + ".")
-        return resp
+        return Devices.DEVupdateDevice(self, system, name, updates)
 
     def deleteDevice(self, system, name):
-        url = system.url + "/api/v/2/devices/" + system.systemKey + "/" + name
-        resp = restcall.delete(url, headers=self.headers)
-        cbLogs.info("Successfully deleted device:", name + ".")
-        return resp
+        return Devices.DEVdeleteDevice(self, system, name)

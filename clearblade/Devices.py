@@ -64,3 +64,59 @@ class Device:
             payload = json.dumps(payload)
         restcall.put(self.url + "/" + self.name, headers=self.headers, data=payload)
         cbLogs.info("Successfully updated", self.name)
+
+
+###########################
+#   DEVELOPER ENDPOINTS   #
+###########################
+
+def DEVnewDevice(developer, system, name, enabled=True, type="", state="", active_key="", allow_certificate_auth=False, allow_key_auth=True, certificate="", description="", keys=""):
+    url = system.url + "/admin/devices/" + system.systemKey + "/" + name
+    data = {
+        "active_key": active_key,
+        "allow_certificate_auth": allow_certificate_auth,
+        "allow_key_auth": allow_key_auth,
+        "certificate": certificate,
+        "description": description,
+        "enabled": enabled,
+        "keys": keys,
+        "name": name,
+        "state": state,
+        "type": type
+    }
+    resp = restcall.post(url, headers=developer.headers, data=data)
+    cbLogs.info("Successfully created", name, "as a device.")
+    return resp
+
+
+def DEVgetDevices(developer, system, query=None):
+    if query:
+        params = {}
+        params["FILTERS"] = query.filters
+        params["SORT"] = query.sorting
+        params = {"query": json.dumps(params)}
+    else:
+        params = ""
+    url = system.url + "/api/v/2/devices/" + system.systemKey
+    resp = restcall.get(url, headers=developer.headers, params=params)
+    return resp
+
+
+def DEVgetDevice(developer, system, name):
+    url = system.url + "/api/v/2/devices/" + system.systemKey + "/" + name
+    resp = restcall.get(url, headers=developer.headers)
+    return resp
+
+
+def DEVupdateDevice(developer, system, name, updates):
+    url = system.url + "/api/v/2/devices/" + system.systemKey + "/" + name
+    resp = restcall.put(url, headers=developer.headers, data=updates)
+    cbLogs.info("Successfully updated device:", name + ".")
+    return resp
+
+
+def DEVdeleteDevice(developer, system, name):
+    url = system.url + "/api/v/2/devices/" + system.systemKey + "/" + name
+    resp = restcall.delete(url, headers=developer.headers)
+    cbLogs.info("Successfully deleted device:", name + ".")
+    return resp
