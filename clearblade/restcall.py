@@ -14,7 +14,10 @@ def panicmessage(resp, reqtype, url, headers, params="", data=""):
         print prettyText.bold + "PARAMS SENT:" + prettyText.endColor, params
     if data:
         print prettyText.bold + "DATA SENT:" + prettyText.endColor, data
-    print prettyText.bold + "DETAILS:" + prettyText.endColor, prettyText.purple + json.loads(resp.text)["error"]["detail"] + prettyText.endColor
+    try:
+        print prettyText.bold + "DETAILS:" + prettyText.endColor, prettyText.bold + prettyText.purple + json.loads(resp.text)["error"]["detail"] + prettyText.endColor
+    except ValueError:
+        print prettyText.bold + "DETAILS:" + prettyText.endColor, "No details provided."
     print ""
     print prettyText.bold + "FULL RESPONSE:" + prettyText.endColor, resp.text
     print ""

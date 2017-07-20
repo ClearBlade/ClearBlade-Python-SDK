@@ -3,6 +3,8 @@ import Users
 import Devices
 import Collections
 import Messaging
+import Code
+from Developers import *  # allows you to import Developer from ClearBladeCore
 import cbLogs
 
 
@@ -22,6 +24,7 @@ class System:
         self.users = []
         self.collections = []
         self.messagingClients = []
+        self.devices = []
         if safe:
             atexit.register(self.__exitcode)
 
@@ -39,11 +42,6 @@ class System:
         anon.authenticate()
         return anon
 
-    def DevUser(self, email, password):
-        dev = Users.DevUser(self, email, password)
-        dev.authenticate()
-        return dev
-
     def registerUser(self, authenticatedUser, email, password):
         n00b = Users.registerUser(self, authenticatedUser, email, password)
         self.users.append(n00b)
@@ -54,11 +52,15 @@ class System:
     ###############
 
     def getDevices(self, authenticatedUser, query=None):
-        self.devices = Devices.getDevices(authenticatedUser, query)
+        self.devices = Devices.getDevices(self, authenticatedUser, query)
         return self.devices
 
-    def Device(self, name):
-        dev = Devices.Device(name)
+    def getDevice(self, authenticatedUser, name):
+        dev = Devices.getDevice(self, authenticatedUser, name)
+        return dev
+
+    def Device(self, name, key="", user=None):
+        dev = Devices.Device(system=self, name=name, key=key, user=user)
         # check if dev in self.devices?
         return dev
 
@@ -82,6 +84,16 @@ class System:
         msg = Messaging.Messaging(user, port, keepalive, url)
         self.messagingClients.append(msg)
         return msg
+
+    ############
+    #   CODE   #
+    ############
+
+    def Service(self, name):
+        return Code.Service(self, name)
+
+    def Library(self):
+        return Code.Library()
 
 
 class Query:

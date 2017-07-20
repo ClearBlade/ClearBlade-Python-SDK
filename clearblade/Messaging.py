@@ -22,6 +22,8 @@ def parse_url(url):
 
 
 # DOES NOT WORK - CURRENTLY IMPOSSIBLE
+#  Paho Python hardcodes the websocket path to "/mqtt" but auth needs "/mqtt_auth".
+#  This pr will allow us to change the path but we won't get it until release 1.3.0 https://github.com/eclipse/paho.mqtt.python/pull/169
 # def authMessaging(system, email, password, port=8903, url="", keepalive=30):
 #     cid = email + ":" + password
 #     tmp = mqtt.Client(client_id=cid)
