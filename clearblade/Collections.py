@@ -1,6 +1,7 @@
-import restcall
+from __future__ import absolute_import
 import json
-import cbLogs
+from . import restcall
+from . import cbLogs
 
 
 class Collection():

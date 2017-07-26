@@ -1,5 +1,6 @@
-import cbLogs
-import restcall
+from __future__ import absolute_import
+from . import cbLogs
+from . import restcall
 
 
 class Service():

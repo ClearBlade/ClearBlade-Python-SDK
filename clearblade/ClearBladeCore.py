@@ -1,11 +1,12 @@
+from __future__ import absolute_import
 import atexit
-import Users
-import Devices
-import Collections
-import Messaging
-import Code
-from Developers import *  # allows you to import Developer from ClearBladeCore
-import cbLogs
+from . import Users
+from . import Devices
+from . import Collections
+from . import Messaging
+from . import Code
+from .Developers import *  # allows you to import Developer from ClearBladeCore
+from . import cbLogs
 
 
 class System:
