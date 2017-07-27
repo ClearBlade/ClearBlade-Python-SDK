@@ -1,6 +1,7 @@
-import restcall
-import cbLogs
-import Devices
+from __future__ import absolute_import
+from . import restcall
+from . import cbLogs
+from . import Devices
 
 
 def registerDev(fname, lname, org, email, password, url="https://platform.clearblade.com"):

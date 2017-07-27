@@ -1,6 +1,7 @@
-import cbLogs
-import restcall
+from __future__ import absolute_import
 import json
+from . import cbLogs
+from . import restcall
 
 
 def getDevices(system, authenticatedUser, query=None):

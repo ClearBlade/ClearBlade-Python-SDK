@@ -1,6 +1,7 @@
+from __future__ import absolute_import
 import paho.mqtt.client as mqtt
-import cbLogs
 import time
+from . import cbLogs
 
 
 # This function strips the scheme and the port (if they exist) off the given url

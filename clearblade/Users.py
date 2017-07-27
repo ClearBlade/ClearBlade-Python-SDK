@@ -1,5 +1,6 @@
-import restcall
-import cbLogs
+from __future__ import absolute_import
+from . import restcall
+from . import cbLogs
 
 
 def registerUser(system, authenticatedUser, email, password):

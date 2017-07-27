@@ -1,26 +1,27 @@
+from __future__ import print_function, absolute_import
+import json
 import requests
 from requests.exceptions import *
-import json
-import cbLogs
-from cbLogs import prettyText
+from . import cbLogs
+from .cbLogs import prettyText
 
 
 def panicmessage(resp, reqtype, url, headers, params="", data=""):
     # beep beep beep
-    print ""
-    print prettyText.bold + prettyText.italics + prettyText.yellow + reqtype + prettyText.endColor, "request to", prettyText.underline + url + prettyText.endColor, "failed with status code", prettyText.bold + prettyText.red + str(resp.status_code) + prettyText.endColor
-    print prettyText.bold + "HEADERS USED:" + prettyText.endColor, headers
+    print("")
+    print(prettyText.bold + prettyText.italics + prettyText.yellow + reqtype + prettyText.endColor, "request to", prettyText.underline + url + prettyText.endColor, "failed with status code", prettyText.bold + prettyText.red + str(resp.status_code) + prettyText.endColor)
+    print(prettyText.bold + "HEADERS USED:" + prettyText.endColor, headers)
     if params:
-        print prettyText.bold + "PARAMS SENT:" + prettyText.endColor, params
+        print(prettyText.bold + "PARAMS SENT:" + prettyText.endColor, params)
     if data:
-        print prettyText.bold + "DATA SENT:" + prettyText.endColor, data
+        print(prettyText.bold + "DATA SENT:" + prettyText.endColor, data)
     try:
-        print prettyText.bold + "DETAILS:" + prettyText.endColor, prettyText.bold + prettyText.purple + json.loads(resp.text)["error"]["detail"] + prettyText.endColor
+        print(prettyText.bold + "DETAILS:" + prettyText.endColor, prettyText.bold + prettyText.purple + json.loads(resp.text)["error"]["detail"] + prettyText.endColor)
     except ValueError:
-        print prettyText.bold + "DETAILS:" + prettyText.endColor, "No details provided."
-    print ""
-    print prettyText.bold + "FULL RESPONSE:" + prettyText.endColor, resp.text
-    print ""
+        print(prettyText.bold + "DETAILS:" + prettyText.endColor, "No details provided.")
+    print("")
+    print(prettyText.bold + "FULL RESPONSE:" + prettyText.endColor, resp.text)
+    print("")
 
 
 def get(url, headers={}, params={}, silent=False):
