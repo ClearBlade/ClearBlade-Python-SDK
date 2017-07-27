@@ -3,6 +3,7 @@ import cbLogs
 import time
 
 
+# This function strips the scheme and the port (if they exist) off the given url
 def parse_url(url):
     s = url.split(":")
     if len(s) == 3:  # we've got http and a port. get rid of them
@@ -19,41 +20,6 @@ def parse_url(url):
         exit(-1)
     else:
         return s[0]
-
-
-# DOES NOT WORK - CURRENTLY IMPOSSIBLE
-#  Paho Python hardcodes the websocket path to "/mqtt" but auth needs "/mqtt_auth".
-#  This pr will allow us to change the path but we won't get it until release 1.3.0 https://github.com/eclipse/paho.mqtt.python/pull/169
-# def authMessaging(system, email, password, port=8903, url="", keepalive=30):
-#     cid = email + ":" + password
-#     tmp = mqtt.Client(client_id=cid)
-#     tmp.username_pw_set(system.systemKey, system.systemSecret)
-
-#     def sub(client, userdata, flags, rc):
-#         print sub
-#         client.subscribe(system.systemKey + "/" + email)
-
-#     def tst(client, userdata, mid, granted_qos):
-#         print userdata
-
-#     def getToken(client, userdata, message):
-#         print message.payload
-#         tmp.loop_stop()
-#         tmp.disconnect()
-
-#     tmp.on_connect = sub
-#     tmp.on_subscribe = tst
-#     tmp.on_message = getToken
-
-#     if not url:
-#         url = system.url
-#     url = parse_url(url)
-
-#     print url
-
-#     tmp.connect_async(url, port, keepalive, "/mqtt_auth")
-#     tmp.loop_start()
-#     time.sleep(5)
 
 
 class Messaging:
