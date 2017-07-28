@@ -35,9 +35,7 @@ class Device:
         self.token = ""
         self.system = system
         if key != "":
-            self.authorize(key)  # use an active key to auth
-        elif user:
-            self.autoAuthorize(name, user)  # use an authenticated user to pull the active key and auth with it
+            self.authorize(key)
         else:
             cbLogs.error("You must provide an active key when creating the device", name)
             exit(-1)
@@ -52,10 +50,6 @@ class Device:
         self.token = str(resp["deviceToken"])
         self.headers["ClearBlade-DeviceToken"] = self.token
         cbLogs.info("Successfully authenticated!")
-
-    def autoAuthorize(self, name, user):
-        resp = restcall.get(self.url + "/" + name, headers=user.headers)
-        self.authorize(resp["active_key"])
 
     def update(self, info):
         payload = info

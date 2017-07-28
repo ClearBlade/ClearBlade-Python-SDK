@@ -60,8 +60,8 @@ class System:
         dev = Devices.getDevice(self, authenticatedUser, name)
         return dev
 
-    def Device(self, name, key="", user=None):
-        dev = Devices.Device(system=self, name=name, key=key, user=user)
+    def Device(self, name, key):
+        dev = Devices.Device(system=self, name=name, key=key)
         # check if dev in self.devices?
         return dev
 
