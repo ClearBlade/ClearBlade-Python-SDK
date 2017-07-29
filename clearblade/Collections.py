@@ -19,7 +19,7 @@ class Collection():
         self.prevPageURL = None
         self.items = []
 
-    def getItems(self, query=None, url="", pagesize=100, pagenum=1):
+    def getItems(self, query=None, pagesize=100, pagenum=1, url=""):
         url = self.url + url
         params = {
             "PAGESIZE": pagesize,
@@ -41,18 +41,18 @@ class Collection():
         self.items = resp["DATA"]
         return self.items
 
-    def getNextPage(self, query=None):
+    def getNextPage(self):
         if self.nextPageURL:
-            self.getItems(query, url=self.nextPageURL)
+            return self.getItems(url=self.nextPageURL)
         else:
             cbLogs.info("No next page!")
 
-    def getPrevPage(self, query=None):
+    def getPrevPage(self):
         if self.prevPageURL:
-            self.getItems(query, url=self.prevPageURL)
+            return self.getItems(url=self.prevPageURL)
         elif self.currentPage == 2:
             # apparently our api doesn't like to be consistent
-            self.getItems(query)
+            return self.getItems()
         else:
             cbLogs.info("No previous page!")
 
