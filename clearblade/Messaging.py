@@ -114,9 +114,8 @@ class Messaging:
 
     def connect(self):
         cbLogs.info("Connecting to MQTT.")
-        self.__mqttc.connect_async(self.__url, self.__port, self.__keepalive)
+        self.__mqttc.connect(self.__url, self.__port, self.__keepalive)
         self.__mqttc.loop_start()
-        time.sleep(1)  # subscribing will not work without this delay so I baked it in
 
     def disconnect(self):
         cbLogs.info("Disconnecting from MQTT.")
