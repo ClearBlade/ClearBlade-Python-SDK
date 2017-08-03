@@ -11,12 +11,23 @@ Both Python 2 and 3 are supported, but all examples written here are in Python 2
 1. Clone or download this repo on to your machine.
 2. Run `python setup.py install`.
 
-### To install for development (of the sdk):
+### To install for development (of the SDK):
 1. Clone or download this repo on to your machine.
-2. Run `python setup.py develop`. This creates a folder called ClearBlade.egg-info in your current directory. You will now be allowed to import the sdk _in the current directory_, and any changes you make to the sdk code will automatically be updated in the egg.
+2. Run `python setup.py develop`. This creates a folder called ClearBlade.egg-info in your current directory. You will now be allowed to import the SDK _in the current directory_, and any changes you make to the SDK code will automatically be updated in the egg.
 
 ## Usage
-The intended entry point for the sdk is the ClearBladeCore module. The beginning of your python file should always include a line like the following:
+1. [Introduction](#introduction)
+1. [Systems](#systems)
+1. [Users](#users)
+1. [Devices](#devices)
+1. [Data Collections](#data-collections)
+1. [MQTT Messaging](#mqtt-messaging)
+1. [Code Services](#code-services)
+1. [Queries](#queries)
+
+### Introduction
+
+The intended entry point for the SDK is the ClearBladeCore module. The beginning of your python file should always include a line like the following:
 
 ```python
 from clearblade.ClearBladeCore import System, Query, Developer
@@ -210,7 +221,7 @@ Every system has a **Messaging** client you can use to communicate between devic
 > Definition: `System.Messaging(user, port=1883, keepalive=30, url="")`   
 > Returns: MQTT Messaging object.
 
-There are a slew of callback functions you may assign. Typically, you want to set these callbacks before you connect to the broker. This is a list of the function names and their expected parameters:   
+There are a slew of callback functions you may assign. Typically, you want to set these callbacks before you connect to the broker. This is a list of the function names and their expected parameters. For more information about the individual callbacks, see the [paho-mqtt](https://github.com/eclipse/paho.mqtt.python#callbacks) documentation.   
 - `on_connect(client, userdata, flags, rc)`   
 - `on_disconnect(client, userdata, rc)`   
 - `on_subscribe(client, userdata, mid, granted_qos)`   
@@ -233,17 +244,208 @@ You can subscribe to as many channels as you like, and subsequently unsubscribe 
 > Definition: `Messaging.unsubscribe(channel)`   
 > Returns: Nothing.
 
-{{publish definition here}}
+Lastly, publishing takes the channel to publish to, and the message to publish as arguments. 
 
 > Definition: `Messaging.publish(channel, message)`   
 > Returns: Nothing.
 
 ##### Examples
+Subscribe to channel and print incoming messages.
+
+```python
+from clearblade.ClearBladeCore import System
+import time
+
+# System credentials
+SystemKey = "9abbd2970baabf8aa6d2a9abcc47"
+SystemSecret = "9ABBD2970BA6AABFE6E8AEB8B14F"
+
+mySystem = System(SystemKey, SystemSecret)
+
+# Log in as Sanket
+sanket = mySystem.User("sanket@clearblade.com", "SpottieOttieDopaliscious")
+
+# Use Sanket to access a messaging client
+mqtt = mySystem.Messaging(sanket)
+
+# Set up callback functions
+def on_connect(client, userdata, flags, rc):
+    # When we connect to the broker, subscribe to the southernplayalisticadillacmuzik channel
+    client.subscribe("southernplayalisticadillacmuzik")
+    
+def on_message(client, userdata, message):
+    # When we receive a message, print it out
+    print "Received message '" + message.payload + "' on topic '" + message.topic + "'"
+    
+# Connect callbacks to client
+mqtt.on_connect = on_connect
+mqtt.on_message = on_message
+
+# Connect and spin for 30 seconds before disconnecting
+mqtt.connect()
+time.sleep(30)
+mqtt.disconnect()
+```
+Publish messages to a channel.
+
+```python
+from clearblade.ClearBladeCore import System
+import random
+
+# System credentials
+SystemKey = "9abbd2970baabf8aa6d2a9abcc47"
+SystemSecret = "9ABBD2970BA6AABFE6E8AEB8B14F"
+
+mySystem = System(SystemKey, SystemSecret)
+
+# Log in as Adam
+adam = mySystem.User("adam@clearblade.com", "a13st0rm")
+
+# Use Adam to access a messaging client
+mqtt = mySystem.Messaging(adam)
 
 
+# Set up callback function
+def on_connect(client, userdata, flags, rc):
+    # When we connect to the broker, start publishing our data to the keelhauled channel
+    for i in range(20):
+        if i%2==0:
+            payload = "yo"
+        else:
+            payload = "ho"
+        client.publish("keelhauled", payload)
+        time.sleep(1)
+
+
+# Connect callback to client
+mqtt.on_connect = on_connect
+
+# Connect and spin for 30 seconds before disconnecting
+mqtt.connect()
+time.sleep(30)
+mqtt.disconnect()
+```
 ### Code Services
 
+Within your system, you may have **Code Services**. These are javascript methods that are run on the ClearBlade Platform rather than locally. To use a code service, all you need is its name.
 
+> Definition: `System.Service(name)`   
+> Returns: Code Service object.
+
+Once you have a code object, you can execute it manually as an authenticated user (or device, or developer). If you want to pass the service parameters, you can pass them as a dictionary to the optional second parameter `params`. 
+
+> Definition: `Service.execute(authenticatedUser, params={}`   
+> Returns: Response from code service.
+
+##### Examples
+Execute a code service with parameters.
+
+```python
+from clearblade.ClearBladeCore import System
+
+# System credentials
+SystemKey = "9abbd2970baabf8aa6d2a9abcc47"
+SystemSecret = "9ABBD2970BA6AABFE6E8AEB8B14F"
+
+mySystem = System(SystemKey, SystemSecret)
+
+# Log in as Aaron
+aaron = mySystem.User("aaron@clearblade.com", "th3w@yY0uM0v3")
+
+# Prepare the gasolineDreams code service
+code = mySystem.Service("gasolineDreams")
+
+# Execute the service as Aaron
+params = {
+    "so_fresh": "so_clean"
+}
+code.execute(aaron, params)
+```
 
 ### Queries
 
+When you fetch data from collections or devices from the device table, you can get more specific results with a **Query**. Note: you must import this module from clearblade.ClearBladeCore, seperately from the System module.
+
+> Definition: `Query()`   
+> Returns: Query object.
+
+Query objects are built through several function calls to gradually narrow your search down. Each operator function takes the column name you're limiting as its first parameter, and the value you want to limit by as its second. The operator functions don't return anything, they change the query object itself. Applying multiple filters to the same query object is logically ANDing them together. The `matches` operator matches a regular expression.
+
+* `Query.equalTo(column, value)`
+* `Query.greaterThan(column, value)`
+* `Query.lessThan(column, value)`
+* `Query.greaterThanEqualTo(column, value)`
+* `Query.lessThanEqualTo(column, value)`
+* `Query.notEqualTo(column, value`
+* `Query.matches(column, value)`
+
+If you want to logically OR two queries together, you can pass one to the `Or` function. Note that once you OR two queries together, you cannot add any more operators through the previous functions. However, you may OR as many queries together as you'd like.
+
+> Definition: `Query.Or(query)`   
+> Returns: New query object representing a logical OR of the filters applied to the original two query objects.
+
+##### Examples
+Querying a data collection.
+
+```python
+from clearblade.ClearBladeCore import System, Query
+
+# System credentials
+SystemKey = "9abbd2970baabf8aa6d2a9abcc47"
+SystemSecret = "9ABBD2970BA6AABFE6E8AEB8B14F"
+
+mySystem = System(SystemKey, SystemSecret)
+
+# Log in as Michael
+michael = mySystem.User("michael@clearblade.com", "sk3wIt0nTh3B@r-B")
+
+# Michael accesses the collection OutKast_Songs
+songs = mySystem.Collection(michael, "OutKast_Songs")
+
+# We only want songs from the album Aquemini, with a length between 180-220 seconds
+q = Query()
+q.equalTo("album", "Aquemini")
+q.greaterThan("length", 180)
+q.lessThat("length", 220)
+
+# Fetch rows that fit our query filters
+rows = myCol.getItems(q)
+
+# Iterate through rows and display them
+for row in rows:
+    print row
+```
+Querying the device table.
+
+```python
+from clearblade.ClearBladeCore import System
+
+# System credentials
+SystemKey = "9abbd2970baabf8aa6d2a9abcc47"
+SystemSecret = "9ABBD2970BA6AABFE6E8AEB8B14F"
+
+mySystem = System(SystemKey, SystemSecret)
+
+# Log in as Jim
+jim = mySystem.User("jim@clearblade.com", "r3turn0fTh3_G_")
+
+# We only want active BLE *or* active Zigbee devices
+q = Query()
+q.equalTo("type", "BLE")
+q.equalTo("state", "active")
+
+q2 = Query()
+q2.equalTo("type", "Zigbee")
+q2.equalTo("state", "active")
+
+# Fetch devices that fit our query filters
+devices = mySystem.getDevices(jim, q.Or(q2))
+
+# Print results
+for device in devices:
+    print device
+```
+## Having Trouble? 
+
+### Can't connect to https from a Mac? 
+Sometimes, the default SSL libraries on MacOS don't quite cut it. Try: `sudo pip install ndg-httpsclient pyasn1 --upgrade --ignore-installed six`
