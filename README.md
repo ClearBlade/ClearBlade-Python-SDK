@@ -1,4 +1,4 @@
-Python-SDK
+ClearBlade-Python-SDK
 ==========
 
 A Python SDK for interacting with the ClearBlade Platform.
