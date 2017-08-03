@@ -93,12 +93,9 @@ class System:
     def Service(self, name):
         return Code.Service(self, name)
 
-    def Library(self):
-        return Code.Library()
-
 
 class Query:
-    def __init__(self, pagesize=100, pagenum=1):
+    def __init__(self):
         self.sorting = []  # only used in fetches. also, not implemented yet. TODO
         self.filters = []
 
