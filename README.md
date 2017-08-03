@@ -55,7 +55,7 @@ Also by default, we automatically log out any users you authenticate when your s
 > Definition: `System(systemKey, systemSecret, url="https://platform.clearblade.com", safe=True)`  
 > Returns: System object.
 
-##### Examples
+#### Examples
 A regular system on the ClearBlade platform.
 
 ```python
@@ -94,7 +94,7 @@ If you allow users to register new user accounts, we have a method for that too.
 > Defininition: `System.registerUser(authenticatedUser, email, password)`  
 > Returns: Regular User object.
 
-##### Examples
+#### Examples
 Authenticating a user.
 
 ```python
@@ -152,7 +152,7 @@ Once you authorize a device through the `System.Device` module, you can update i
 > Definition: `Device.update(info)`  
 > Returns: Nothing.
 
-##### Examples
+#### Examples
 Updating a device's state.
 
 ```python
@@ -191,7 +191,7 @@ Once you fetch items, they get stored to a collection attribute called `items`. 
 > Definition: `Collection.getPrevPage()`  
 > Returns: List of rows from the previous page of your last request.
 
-##### Examples
+#### Examples
 Iterate through first page of a collection.
 
 ```python
@@ -249,7 +249,7 @@ Lastly, publishing takes the channel to publish to, and the message to publish a
 > Definition: `Messaging.publish(channel, message)`   
 > Returns: Nothing.
 
-##### Examples
+#### Examples
 Subscribe to channel and print incoming messages.
 
 ```python
@@ -337,7 +337,7 @@ Once you have a code object, you can execute it manually as an authenticated use
 > Definition: `Service.execute(authenticatedUser, params={}`   
 > Returns: Response from code service.
 
-##### Examples
+#### Examples
 Execute a code service with parameters.
 
 ```python
@@ -384,7 +384,7 @@ If you want to logically OR two queries together, you can pass one to the `Or` f
 > Definition: `Query.Or(query)`   
 > Returns: New query object representing a logical OR of the filters applied to the original two query objects.
 
-##### Examples
+#### Examples
 Querying a data collection.
 
 ```python
