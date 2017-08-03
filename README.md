@@ -26,14 +26,14 @@ Both Python 2 and 3 are supported, but all examples written here are in Python 2
 1. [Queries](#queries)
 
 ### Introduction
-
+---
 The intended entry point for the SDK is the ClearBladeCore module. The beginning of your python file should always include a line like the following:
 
 ```python
 from clearblade.ClearBladeCore import System, Query, Developer
 ```
 
-System, Query, and Developer are the only three classes you should ever need to import directly into your project, however Query and Developer are only used in special situations. 
+System, Query, and Developer are the only three classes you should ever need to import directly into your project, however Query and Developer are only used in special situations. To register a developer, you will need to import the `registerDev` function from ClearBladeCore.
 
 If you want to enable console logging, you must also set the debug flags. The module `cbLogs` has a `DEBUG` flag which enables verbose console messages, and an `MQTT_DEBUG` flag which displays additional logging specifically pertaining to MQTT messaging. 
 
@@ -46,6 +46,7 @@ cbLogs.MQTT_DEBUG = True
 ```
 
 ### Systems
+---
 On the ClearBlade platform, you develop IoT solutions through **Systems**. Systems are identified by their SystemKey and SystemSecret. These are the only two parameters needed to work with your system. 
 
 By default, we assume your system lives on our public domain: "https://platform.clearblade.com". If your system lives elsewhere, you can pass the url as the optional third parameter named `url`.
@@ -81,6 +82,7 @@ mySystem = System(SystemKey, SystemSecret, url, safe=False)
 ```
 
 ### Users
+---
 Within your System, you may have **User** accounts that can perform actions. Users can be authenticated with their email and password. You may also allow for people to authenticate to your system anonymously. In this case, no email or password is needed. 
 
 > Definition: `System.User(email, password)`  
@@ -132,6 +134,7 @@ martin = mySystem.registerUser(anon, "martin@clearblade.com", "aQu3m1n1")
 ```
 
 ### Devices
+---
 Another common entity that may interact with your system is a **Device**. Similar to users, devices must be authenticated before you can use them. To authenticate a device, you need its _active key_. 
 
 > Definition: `System.Device(name, key)`  
@@ -173,6 +176,7 @@ ble.update({"state": "ON"})
 ```
 
 ### Data Collections
+---
 Every system has an internal database with tables called **Collections**. You need to be an authenticated user to access them, and you must identify them by either their _name_ or their _id_. 
 
 > Definition: `System.Collection(authenticatedUser, collectionID="", collectionName="")`  
@@ -216,6 +220,7 @@ for row in rows:
 ```
 
 ### MQTT Messaging
+---
 Every system has a **Messaging** client you can use to communicate between devices using the MQTT protocol. To become an MQTT client, all you need is an authenticated user (or device, or developer). If your MQTT broker uses a different port from the default (1883), you can set it with the optional second parameter `port`. The default keep-alive time is 30 seconds, but you can change that with the optional third parameter `keepalive`. Lastly, if your broker lives at a different url than your system, you can specify that with the optional fourth parameter `url`. 
 
 > Definition: `System.Messaging(user, port=1883, keepalive=30, url="")`   
@@ -326,7 +331,7 @@ time.sleep(30)
 mqtt.disconnect()
 ```
 ### Code Services
-
+---
 Within your system, you may have **Code Services**. These are javascript methods that are run on the ClearBlade Platform rather than locally. To use a code service, all you need is its name.
 
 > Definition: `System.Service(name)`   
@@ -363,7 +368,7 @@ code.execute(aaron, params)
 ```
 
 ### Queries
-
+---
 When you fetch data from collections or devices from the device table, you can get more specific results with a **Query**. Note: you must import this module from clearblade.ClearBladeCore, seperately from the System module.
 
 > Definition: `Query()`   
@@ -445,6 +450,60 @@ devices = mySystem.getDevices(jim, q.Or(q2))
 for device in devices:
     print device
 ```
+## Developer Usage
+Developer usage is not fully implemented yet and is currently restricted to the following classes:
+
+1. [Devices](#devices-1)
+
+**Developers** have a less restricted access to your system's components. However, developer functionality is not object oriented. Additionally, since a developer may have multiple systems, most functions will require you to pass in a [System](#systems) object. 
+
+If you're not already a developer, you can register yourself from the SDK. You need the typical credentials: first name, last name, organization, email, and password. You will have to import this function directly from `clearblade.ClearBladeCore`.
+
+By default, we assume you're registering on our public domain: "https://platform.clearblade.com". If you're registering elsewhere, you can pass the url as the optional sixth parameter named `url`.
+
+> Definition: `registerDev(fname, lname, org, email, password, url="https://platform.clearblade.com")`   
+> Returns: Developer object.
+
+If you're already a registered developer with the platform, you can log in with your email and password. Like the registration function, if you're logging into an account on a different domain than the default, you can pass it in as the optional third parameter named `url`. 
+
+> Definition: `Developer(email, password, url="https://platform.clearblade.com")`   
+> Returns: Developer object.
+
+When you create your developer object you will be automatically authenticated. You may then log out and authenticate yourself again as many times as you like with the aptly named functions below. 
+
+> Definition: `Developer.logout()`   
+> Returns: Nothing.
+> 
+> Definition: `Developer.authenticate()`   
+> Returns: Nothing.
+
+### Devices
+---
+As a developer, you get full CRUD access to the device table. 
+
+To create a device, you need to specify the system it's going to live in, and the name of the device you're creating. There are many other optional parameters that you may set if you please, but all have default values if you're feeling lazy. Note: you should keep enabled set to True and allow at least one type of authentication if you want to interact with the device through the non-developer endpoints.
+
+> Definition: `Developer.newDevice(system, name, enabled=True, type="", state="", active_key="", allow_certificate_auth=False, allow_key_auth=True, certificate="", description="", keys="")`   
+> Returns: Response from http call.
+
+You can get a full list of devices in your system's device table and query it if you'd like. If you have a specific device you want information about, you can ask for that device by name. 
+
+> Definition: `Developer.getDevices(system, query=None)`   
+> Returns: Response from http call.
+
+> Definition: `Developer.getDevice(self, system, name)`   
+> Returns: Response from http call.
+
+Updating a device takes the system object, name of the device, and a dictionary of the updates you are making. 
+
+> Definition: `Developer.updateDevice(self, system, name, updates)`   
+> Returns: Response from http call.
+
+Deleting a device is as simple as passing in the system object where it lives and the name of the device. 
+
+> Definition: `Developer.deleteDevice(self, system, name)`   
+> Returns: Response from http call.
+
 ## Having Trouble? 
 
 ### Can't connect to https from a Mac? 

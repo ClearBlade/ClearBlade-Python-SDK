@@ -17,9 +17,9 @@ def registerDev(fname, lname, org, email, password, url="https://platform.clearb
         "Content-Type": "application/json"
     }
     cbLogs.info("Registering", email, "as a developer...")
-    resp = restcall.post(url + '/admin/reg', headers=headers, data=newDevCredentials, silent=True)
+    resp = restcall.post(url + '/admin/reg', headers=headers, data=newDevCredentials)
     try:
-        newDev = Developer(url, email, password)
+        newDev = Developer(email, password, url)
         newDev.token = str(resp["dev_token"])
         newDev.headers["ClearBlade-DevToken"] = newDev.token
         cbLogs.info("Successfully registered", email, "as a developer!")
