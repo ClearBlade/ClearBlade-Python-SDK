@@ -11,7 +11,7 @@ class Collection():
         elif collectionName:
             self.url = system.url + '/api/v/1/collection/' + system.systemKey + "/" + collectionName
         else:
-            cbLogs.error("beep")
+            cbLogs.error("You must supply either a collection name or id.")  # beep
             exit(-1)
         self.headers = authenticatedUser.headers
         self.currentPage = 0

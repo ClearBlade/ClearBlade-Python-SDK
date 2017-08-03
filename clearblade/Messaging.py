@@ -1,6 +1,5 @@
 from __future__ import absolute_import
 import paho.mqtt.client as mqtt
-import time
 from . import cbLogs
 
 
@@ -17,7 +16,7 @@ def parse_url(url):
         else:
             return s[0]
     elif len(s) > 3:
-        cbLogs.error("wth kind of url is this??", url)
+        cbLogs.error("Couldn't parse this url:", url)
         exit(-1)
     else:
         return s[0]
