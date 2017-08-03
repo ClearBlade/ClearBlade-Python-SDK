@@ -25,8 +25,8 @@ Both Python 2 and 3 are supported, but all examples written here are in Python 2
 1. [Code Services](#code-services)
 1. [Queries](#queries)
 
-### Introduction
 ---
+### Introduction
 The intended entry point for the SDK is the ClearBladeCore module. The beginning of your python file should always include a line like the following:
 
 ```python
@@ -44,9 +44,8 @@ from clearblade import cbLogs
 cbLogs.DEBUG = True
 cbLogs.MQTT_DEBUG = True
 ```
-
-### Systems
 ---
+### Systems
 On the ClearBlade platform, you develop IoT solutions through **Systems**. Systems are identified by their SystemKey and SystemSecret. These are the only two parameters needed to work with your system. 
 
 By default, we assume your system lives on our public domain: "https://platform.clearblade.com". If your system lives elsewhere, you can pass the url as the optional third parameter named `url`.
@@ -80,9 +79,8 @@ url = "https://mydomain.clearblade.com"
 
 mySystem = System(SystemKey, SystemSecret, url, safe=False)
 ```
-
-### Users
 ---
+### Users
 Within your System, you may have **User** accounts that can perform actions. Users can be authenticated with their email and password. You may also allow for people to authenticate to your system anonymously. In this case, no email or password is needed. 
 
 > Definition: `System.User(email, password)`  
@@ -132,9 +130,8 @@ anon = mySystem.AnonUser()
 # Use the anon user to register Martin
 martin = mySystem.registerUser(anon, "martin@clearblade.com", "aQu3m1n1")
 ```
-
-### Devices
 ---
+### Devices
 Another common entity that may interact with your system is a **Device**. Similar to users, devices must be authenticated before you can use them. To authenticate a device, you need its _active key_. 
 
 > Definition: `System.Device(name, key)`  
@@ -174,9 +171,8 @@ activeKey = "ATL13ns"
 ble = mySystem.Device(name, activeKey)
 ble.update({"state": "ON"})
 ```
-
-### Data Collections
 ---
+### Data Collections
 Every system has an internal database with tables called **Collections**. You need to be an authenticated user to access them, and you must identify them by either their _name_ or their _id_. 
 
 > Definition: `System.Collection(authenticatedUser, collectionID="", collectionName="")`  
@@ -218,9 +214,8 @@ rows = myCol.getItems()
 for row in rows:
     print row
 ```
-
-### MQTT Messaging
 ---
+### MQTT Messaging
 Every system has a **Messaging** client you can use to communicate between devices using the MQTT protocol. To become an MQTT client, all you need is an authenticated user (or device, or developer). If your MQTT broker uses a different port from the default (1883), you can set it with the optional second parameter `port`. The default keep-alive time is 30 seconds, but you can change that with the optional third parameter `keepalive`. Lastly, if your broker lives at a different url than your system, you can specify that with the optional fourth parameter `url`. 
 
 > Definition: `System.Messaging(user, port=1883, keepalive=30, url="")`   
@@ -330,8 +325,8 @@ mqtt.connect()
 time.sleep(30)
 mqtt.disconnect()
 ```
-### Code Services
 ---
+### Code Services
 Within your system, you may have **Code Services**. These are javascript methods that are run on the ClearBlade Platform rather than locally. To use a code service, all you need is its name.
 
 > Definition: `System.Service(name)`   
@@ -355,7 +350,7 @@ SystemSecret = "9ABBD2970BA6AABFE6E8AEB8B14F"
 mySystem = System(SystemKey, SystemSecret)
 
 # Log in as Aaron
-aaron = mySystem.User("aaron@clearblade.com", "th3w@yY0uM0v3")
+aaron = mySystem.User("aaron@clearblade.com", "Ms_J@cks0n")
 
 # Prepare the gasolineDreams code service
 code = mySystem.Service("gasolineDreams")
@@ -366,9 +361,8 @@ params = {
 }
 code.execute(aaron, params)
 ```
-
-### Queries
 ---
+### Queries
 When you fetch data from collections or devices from the device table, you can get more specific results with a **Query**. Note: you must import this module from clearblade.ClearBladeCore, seperately from the System module.
 
 > Definition: `Query()`   
@@ -477,32 +471,100 @@ When you create your developer object you will be automatically authenticated. Y
 > Definition: `Developer.authenticate()`   
 > Returns: Nothing.
 
-### Devices
+#### Examples
+Register a developer.
+
+```python
+from clearblade.ClearBladeCore import registerDev
+
+# Andre's credentials
+first_name = "Andre"
+last_name = "3000"
+organization = "OutKast"
+email = "andre.l.benjamin@outkast.com"
+password = "h3y_y@!"
+
+# Register Andre with the ClearBlade Platform
+andre = registerDev(first_name, last_name, organization, email, password)
+```
+
+Log in as a developer.
+
+```python
+from clearblade.ClearBladeCore import Developer
+
+# Log in as Big Boi
+bigboi = Developer("antwan.a.patton@outkast.com", "th3w@yY0uM0v3")
+```
 ---
+### Devices
 As a developer, you get full CRUD access to the device table. 
 
 To create a device, you need to specify the system it's going to live in, and the name of the device you're creating. There are many other optional parameters that you may set if you please, but all have default values if you're feeling lazy. Note: you should keep enabled set to True and allow at least one type of authentication if you want to interact with the device through the non-developer endpoints.
 
 > Definition: `Developer.newDevice(system, name, enabled=True, type="", state="", active_key="", allow_certificate_auth=False, allow_key_auth=True, certificate="", description="", keys="")`   
-> Returns: Response from http call.
+> Returns: Dictionary of the new device's attributes.
 
-You can get a full list of devices in your system's device table and query it if you'd like. If you have a specific device you want information about, you can ask for that device by name. 
+You can get a full list of devices in your system's device table and [query](#queries) it if you'd like. If you have a specific device you want information about, you can ask for that device by name. 
 
 > Definition: `Developer.getDevices(system, query=None)`   
-> Returns: Response from http call.
+> Returns: List of devices. Each device is a dictionary of their attributes.
 
-> Definition: `Developer.getDevice(self, system, name)`   
-> Returns: Response from http call.
+> Definition: `Developer.getDevice(system, name)`   
+> Returns: Dictionary of the requested device's attributes.
 
 Updating a device takes the system object, name of the device, and a dictionary of the updates you are making. 
 
-> Definition: `Developer.updateDevice(self, system, name, updates)`   
-> Returns: Response from http call.
+> Definition: `Developer.updateDevice(system, name, updates)`   
+> Returns: Dictionary of the updated device's attributes.
 
 Deleting a device is as simple as passing in the system object where it lives and the name of the device. 
 
-> Definition: `Developer.deleteDevice(self, system, name)`   
-> Returns: Response from http call.
+> Definition: `Developer.deleteDevice(system, name)`   
+> Returns: Nothing.
+
+#### Examples
+Creating and updating a device.
+
+```python
+from clearblade.ClearBladeCore import System, Developer
+
+# System credentials
+SystemKey = "9abbd2970baabf8aa6d2a9abcc47"
+SystemSecret = "9ABBD2970BA6AABFE6E8AEB8B14F"
+
+mySystem = System(SystemKey, SystemSecret)
+
+# Log in as Steve
+steve = Developer("steve@clearblade.com", "r0s@_p@rks")
+
+# Create new device named Elevators
+steve.newDevice(mySystem, "Elevators")
+
+# Update device description
+steve.updateDevice(mySystem, "Elevators", {"description": "(Me & You)"})
+```
+Getting device information and deleting a device.
+
+```python
+from clearblade.ClearBladeCore import System, Developer
+
+# System credentials
+SystemKey = "9abbd2970baabf8aa6d2a9abcc47"
+SystemSecret = "9ABBD2970BA6AABFE6E8AEB8B14F"
+
+mySystem = System(SystemKey, SystemSecret)
+
+# Log in as Kevin
+devKev = Developer("kevin@clearblade.com", "j@zZy_b3ll3")
+
+# Get device named TwoDopeBoyz
+tdb = devKev.getDevice(mySystem, "TwoDopeBoyz")
+
+# Conditional delete
+if tdb["description"] != "(In a Cadillac)":
+    devKev.deleteDevice(mySystem, "TwoDopeBoyz")
+```
 
 ## Having Trouble? 
 
