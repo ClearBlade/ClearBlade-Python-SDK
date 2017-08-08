@@ -9,7 +9,8 @@ Both Python 2 and 3 are supported, but all examples written here are in Python 2
 
 ### To install for regular use:
 1. Clone or download this repo on to your machine.
-2. Run `python setup.py install`.
+2. Run `python setup.py install`. # Rob: Required sudo on my machine 
+3. If on Mac, update your SSL libraries `sudo pip install ndg-httpsclient pyasn1 --upgrade --ignore-installed six`
 
 ### To install for development (of the SDK):
 1. Clone or download this repo on to your machine.
@@ -30,7 +31,7 @@ Both Python 2 and 3 are supported, but all examples written here are in Python 2
 The intended entry point for the SDK is the ClearBladeCore module. The beginning of your python file should always include a line like the following:
 
 ```python
-from clearblade.ClearBladeCore import System, Query, Developer
+from clearblade.ClearBladeCore import System, Query, Developer, cbLogs
 ```
 
 System, Query, and Developer are the only three classes you should ever need to import directly into your project, however Query and Developer are only used in special situations. To register a developer, you will need to import the `registerDev` function from ClearBladeCore.
@@ -41,8 +42,8 @@ If you want to enable console logging, you must also set the debug flags. The mo
 from clearblade import cbLogs
 
 # Enable console logging
-DEBUG = True
-MQTT_DEBUG = True
+cbLogs.DEBUG = True
+cbLogs.MQTT_DEBUG = True
 ```
 ---
 ### Systems
@@ -67,7 +68,7 @@ SystemSecret = "9ABBD2970BA6AABFE6E8AEB8B14F"
 
 mySystem = System(SystemKey, SystemSecret)
 ```
-A system hosted on mydomain.clearblade.com with the auto-logout disabled.
+A system hosted on a customer platform, such as https://customer.clearblade.com
 
 ```python
 from clearblade.ClearBladeCore import System
@@ -75,10 +76,26 @@ from clearblade.ClearBladeCore import System
 # System credentials
 SystemKey = "9abbd2970baabf8aa6d2a9abcc47"
 SystemSecret = "9ABBD2970BA6AABFE6E8AEB8B14F"
-url = "https://mydomain.clearblade.com"
+url = "https://customer.clearblade.com"
+
+mySystem = System(SystemKey, SystemSecret, url)
+```
+
+```
+A system hosted on a customer platform, such as https://customer.clearblade.com with the auto-logout disabled.
+
+```python
+from clearblade.ClearBladeCore import System
+
+# System credentials
+SystemKey = "9abbd2970baabf8aa6d2a9abcc47"
+SystemSecret = "9ABBD2970BA6AABFE6E8AEB8B14F"
+url = "https://customer.clearblade.com"
 
 mySystem = System(SystemKey, SystemSecret, url, safe=False)
 ```
+
+
 ---
 ### Users
 Within your System, you may have **User** accounts that can perform actions. Users can be authenticated with their email and password. You may also allow for people to authenticate to your system anonymously. In this case, no email or password is needed. 
@@ -565,8 +582,3 @@ tdb = devKev.getDevice(mySystem, "TwoDopeBoyz")
 if tdb["description"] != "(In a Cadillac)":
     devKev.deleteDevice(mySystem, "TwoDopeBoyz")
 ```
-
-## Having Trouble? 
-
-### Can't connect to https from a Mac? 
-Sometimes, the default SSL libraries on MacOS don't quite cut it. Try: `sudo pip install ndg-httpsclient pyasn1 --upgrade --ignore-installed six`
