@@ -41,8 +41,8 @@ If you want to enable console logging, you must also set the debug flags. The mo
 from clearblade import cbLogs
 
 # Enable console logging
-cbLogs.DEBUG = True
-cbLogs.MQTT_DEBUG = True
+DEBUG = True
+MQTT_DEBUG = True
 ```
 ---
 ### Systems
