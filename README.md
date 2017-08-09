@@ -9,7 +9,7 @@ Both Python 2 and 3 are supported, but all examples written here are in Python 2
 
 ### To install for regular use:
 1. Clone or download this repo on to your machine.
-2. Run `python setup.py install`. # Rob: Required sudo on my machine 
+2. Run `python setup.py install`. # TODO Rob: Required sudo on my machine, is this typical? If so, add a note
 3. If on Mac, update your SSL libraries `sudo pip install ndg-httpsclient pyasn1 --upgrade --ignore-installed six`
 
 ### To install for development (of the SDK):
@@ -223,8 +223,8 @@ mySystem = System(SystemKey, SystemSecret)
 # Log in as Clark
 clark = mySystem.User("clark@clearblade.com", "h00t13h00")
 
-# Clark accesses the collection myCol
-myCol = mySystem.Collection(clark, "e0b0e2920bfec2e1e0a2ffa6ce10")
+# Clark accesses the collection 'carolines_guys'
+myCol = mySystem.Collection(clark, collectionName="carolines_guys")
 rows = myCol.getItems()
 
 # Iterate through rows and display them
@@ -233,7 +233,7 @@ for row in rows:
 ```
 ---
 ### MQTT Messaging
-Every system has a **Messaging** client you can use to communicate between devices using the MQTT protocol. To become an MQTT client, all you need is an authenticated user (or device, or developer). If your MQTT broker uses a different port from the default (1883), you can set it with the optional second parameter `port`. The default keep-alive time is 30 seconds, but you can change that with the optional third parameter `keepalive`. Lastly, if your broker lives at a different url than your system, you can specify that with the optional fourth parameter `url`. 
+Every system has a **Messaging** client you can use to communicate between authenticated entities (evices, users, edges, developers, platforms, so on) using the MQTT protocol. To become an MQTT client, all you need is an authenticated entity. If your MQTT broker uses a different port from the default (1883), you can set it with the optional second parameter `port`. The default keep-alive time is 30 seconds, but you can change that with the optional third parameter `keepalive`. Lastly, if your broker lives at a different url than your system, you can specify that with the optional fourth parameter `url`. 
 
 > Definition: `System.Messaging(user, port=1883, keepalive=30, url="")`   
 > Returns: MQTT Messaging object.
@@ -246,6 +246,9 @@ There are a slew of callback functions you may assign. Typically, you want to se
 - `on_publish(client, userdata, mid)`   
 - `on_message(client, userdata, mid)`   
 - `on_log(client, userdata, level, buf)`   
+
+# TODO Do any of these behave like the previous SDK's #processMessage
+# which blocked until received message, processed then unblocked, and repeated? We have a need for longstanding pythons scripts that use this logic
 
 Before publishing or subscribing, you must connect your client to the broker. After you're finished, it's good practice to disconnect from the broker before quitting your program. These are both simple functions that take no parameters.
 
