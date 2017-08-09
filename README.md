@@ -10,12 +10,16 @@ Both Python 2 and 3 are supported, but all examples written here are in Python 2
 ### To install for regular use:
 1. Clone or download this repo on to your machine.
 2. Run `python setup.py install`.
-   This may require additional privledges. If it complains, run again with `sudo -H`.
-3. If on Mac, update your SSL libraries `sudo pip install ndg-httpsclient pyasn1 --upgrade --ignore-installed six`
+   This may require additional privledges. 
+   If it complains, run again with `sudo -H`.
+3. If on Mac, you may need to update your SSL libraries. 
+   If your connections are failing, try: `sudo pip install ndg-httpsclient pyasn1 --upgrade --ignore-installed six`
 
 ### To install for development (of the SDK):
 1. Clone or download this repo on to your machine.
-2. Run `python setup.py develop`. This creates a folder called ClearBlade.egg-info in your current directory. You will now be allowed to import the SDK _in the current directory_, and any changes you make to the SDK code will automatically be updated in the egg.
+2. Run `python setup.py develop`. 
+   This creates a folder called ClearBlade.egg-info in your current directory. 
+   You will now be allowed to import the SDK _in the current directory_, and any changes you make to the SDK code will automatically be updated in the egg.
 
 ## Usage
 1. [Introduction](#introduction)
@@ -26,18 +30,23 @@ Both Python 2 and 3 are supported, but all examples written here are in Python 2
 1. [MQTT Messaging](#mqtt-messaging)
 1. [Code Services](#code-services)
 1. [Queries](#queries)
+1. [Developers](#developer-usage)
 
 ---
 ### Introduction
-The intended entry point for the SDK is the ClearBladeCore module. The beginning of your python file should always include a line like the following:
+The intended entry point for the SDK is the ClearBladeCore module. 
+The beginning of your python file should always include a line like the following:
 
 ```python
 from clearblade.ClearBladeCore import System, Query, Developer
 ```
 
-System, Query, and Developer are the only three classes you should ever need to import directly into your project, however Query and Developer are only used in special situations. To register a developer, you will also need to import the `registerDev` function from ClearBladeCore.
+System, Query, and Developer are the only three classes you should ever need to import directly into your project, however Query and Developer are only used in special situations. 
+To register a developer, you will also need to import the `registerDev` function from ClearBladeCore.
 
-By default, we enable verbose console output. If you want your script to be quiet, you can disable the logs with by importing the `cbLogs` module and setting the `DEBUG` and `MQTT_DEBUG` flags to `False`. Note that errors will always be printed, even if the debug flags are set to false. 
+By default, we enable verbose console output. 
+If you want your script to be quiet, you can disable the logs with by importing the `cbLogs` module and setting the `DEBUG` and `MQTT_DEBUG` flags to `False`. 
+Note that errors will always be printed, even if the debug flags are set to false. 
 
 ```python
 from clearblade.ClearBladeCore import cbLogs
@@ -48,11 +57,17 @@ cbLogs.MQTT_DEBUG = False
 ```
 ---
 ### Systems
-On the ClearBlade platform, you develop IoT solutions through **Systems**. Systems are identified by their SystemKey and SystemSecret. These are the only two parameters needed to work with your system. 
+On the ClearBlade platform, you develop IoT solutions through **Systems**. 
+Systems are identified by their SystemKey and SystemSecret. 
+These are the only two parameters needed to work with your system. 
 
-By default, we assume your system lives on our public domain: "https://platform.clearblade.com". If your system lives elsewhere, you can pass the url as the optional third parameter named `url`.
+By default, we assume your system lives on our public domain: "https://platform.clearblade.com". 
+If your system lives elsewhere, you can pass the url as the optional third parameter named `url`.
 
-Also by default, we automatically log out any users you authenticate when your script exits. We wrote it this way to reduce the number of user tokens being produced from running a script repeatedly. However, we realize that there are legitimate use cases of wanting to keep users logged in. You can turn off this functionality by passing the boolean `False` as the optional fourth parameter named `safe`.
+Also by default, we automatically log out any users you authenticate when your script exits. 
+We wrote it this way to reduce the number of user tokens being produced from running a script repeatedly. 
+However, we realize that there are legitimate use cases of wanting to keep users logged in. 
+You can turn off this functionality by passing the boolean `False` as the optional fourth parameter named `safe`.
 
 > Definition: `System(systemKey, systemSecret, url="https://platform.clearblade.com", safe=True)`  
 > Returns: System object.
@@ -96,7 +111,10 @@ mySystem = System(SystemKey, SystemSecret, url, safe=False)
 ```
 ---
 ### Users
-Within your System, you may have **User** accounts that can perform actions. Users can be authenticated with their email and password. You may also allow for people to authenticate to your system anonymously. In this case, no email or password is needed. 
+Within your System, you may have **User** accounts that can perform actions. 
+Users can be authenticated with their email and password. 
+You may also allow for people to authenticate to your system anonymously. 
+In this case, no email or password is needed. 
 
 > Definition: `System.User(email, password)`  
 > Returns: Regular User object.
@@ -104,7 +122,10 @@ Within your System, you may have **User** accounts that can perform actions. Use
 > Definition: `System.AnonUser()`  
 > Returns: Anonymous User object.
 
-If you allow users to register new user accounts, we have a method for that too. You need to first authenticate as a user that has the permissions to do so using one of the functions defined above. Then you can register a new user with their email and password. Note that this authenticated user may also be a device or developer.
+If you allow users to register new user accounts, we have a method for that too. 
+You need to first authenticate as a user that has the permissions to do so using one of the functions defined above. 
+Then you can register a new user with their email and password. 
+Note that this authenticated user may also be a device or developer.
 
 > Defininition: `System.registerUser(authenticatedUser, email, password)`  
 > Returns: Regular User object.
@@ -147,17 +168,23 @@ martin = mySystem.registerUser(anon, "martin@clearblade.com", "aQu3m1n1")
 ```
 ---
 ### Devices
-Another common entity that may interact with your system is a **Device**. Similar to users, devices must be authenticated before you can use them. To authenticate a device, you need its _active key_. 
+Another common entity that may interact with your system is a **Device**. 
+Similar to users, devices must be authenticated before you can use them. 
+To authenticate a device, you need its _active key_. 
 
 > Definition: `System.Device(name, key)`  
 > Returns: Device object.
 
-Want to get a list of all the devices an authenticated entity (user, device, or developer) can view? Simple. We even have a way to query those devices with the optional second parameter called `query`. For more information on this functionality, see [Queries](#queries).
+Want to get a list of all the devices an authenticated entity (user, device, or developer) can view?
+Simple. 
+We even have a way to query those devices with the optional second parameter called `query`. 
+For more information on this functionality, see [Queries](#queries).
 
 > Definition: `System.getDevices(authenticatedUser, query=None)`  
 > Returns: List of devices. Each device is a dictionary of their attributes. 
 
-Only interested in a single device's information? If an authenticated user has permission to read its attributes and knows its name, we can do that. 
+Only interested in a single device's information? 
+If an authenticated user has permission to read its attributes and knows its name, we can do that. 
 
 > Definition: `System.getDevice(authenticatedUser, name)`   
 > Returns: A dictionary of the requested device's attributes.
@@ -188,17 +215,25 @@ ble.update({"state": "ON"})
 ```
 ---
 ### Data Collections
-Every system has an internal database with tables called **Collections**. You need to be an authenticated user to access them, and you must identify them by either their _name_ or their _id_. 
+Every system has an internal database with tables called **Collections**. 
+You need to be an authenticated user to access them, and you must identify them by either their _name_ or their _id_. 
 
 > Definition: `System.Collection(authenticatedUser, collectionID="", collectionName="")`  
 > Returns: Collection object.
 
-Fetching items from your collection can be done through the `getItems` function. This function has three optional parameters you can add: `query` allows you to only search for certain items (see [Queries](#queries)), `pagesize` lets you choose the maximum number of rows to return at once, and `pagenum` will request a specific page if there are multiple. `url` is an internal parameter and should not be used. 
+Fetching items from your collection can be done through the `getItems` function. 
+This function has three optional parameters you can add: 
+`query` allows you to only search for certain items (see [Queries](#queries)), 
+`pagesize` lets you choose the maximum number of rows to return at once, and 
+`pagenum` will request a specific page if there are multiple. 
+`url` is an internal parameter and should not be used. 
 
 > Definition: `Collection.getItems(query=None, pagesize=100, pagenum=1, url="")`  
 > Returns: List of rows that match your query. Each row is a dictionary of its column values.
 
-Once you fetch items, they get stored to a collection attribute called `items`. We also store some information about your last request with that collection object to make multipage data parsing a little easier. We have a function to fetch the next page and the previous page of the last request you made, which update the collection's `items` attribute.
+Once you fetch items, they get stored to a collection attribute called `items`. 
+We also store some information about your last request with that collection object to make multipage data parsing a little easier. 
+We have a function to fetch the next page and the previous page of the last request you made, which update the collection's `items` attribute.
 
 > Definition: `Collection.getNextPage()`  
 > Returns: List of rows from the next page of your last request.
@@ -231,12 +266,19 @@ for row in rows:
 ```
 ---
 ### MQTT Messaging
-Every system has a **Messaging** client you can use to communicate between authenticated entities (devices, users, edges, developers, platforms, so on) using the MQTT protocol. To become an MQTT client, all you need is an authenticated entity (user, device, or developer). If your MQTT broker uses a different port from the default (1883), you can set it with the optional second parameter `port`. The default keep-alive time is 30 seconds, but you can change that with the optional third parameter `keepalive`. Lastly, if your broker lives at a different url than your system, you can specify that with the optional fourth parameter `url`. 
+Every system has a **Messaging** client you can use to communicate between authenticated entities (devices, users, edges, developers, platforms, so on) using the MQTT protocol. 
+To become an MQTT client, all you need is an authenticated entity (user, device, or developer). 
+If your MQTT broker uses a different port from the default (1883), you can set it with the optional second parameter `port`. 
+The default keep-alive time is 30 seconds, but you can change that with the optional third parameter `keepalive`. 
+Lastly, if your broker lives at a different url than your system, you can specify that with the optional fourth parameter `url`. 
 
 > Definition: `System.Messaging(user, port=1883, keepalive=30, url="")`   
 > Returns: MQTT Messaging object.
 
-There are a slew of callback functions you may assign. Typically, you want to set these callbacks before you connect to the broker. This is a list of the function names and their expected parameters. For more information about the individual callbacks, see the [paho-mqtt](https://github.com/eclipse/paho.mqtt.python#callbacks) documentation.   
+There are a slew of callback functions you may assign. 
+Typically, you want to set these callbacks before you connect to the broker. 
+This is a list of the function names and their expected parameters. 
+For more information about the individual callbacks, see the [paho-mqtt](https://github.com/eclipse/paho.mqtt.python#callbacks) documentation.   
 - `on_connect(client, userdata, flags, rc)`   
 - `on_disconnect(client, userdata, rc)`   
 - `on_subscribe(client, userdata, mid, granted_qos)`   
@@ -245,7 +287,9 @@ There are a slew of callback functions you may assign. Typically, you want to se
 - `on_message(client, userdata, mid)`   
 - `on_log(client, userdata, level, buf)`   
 
-Before publishing or subscribing, you must connect your client to the broker. After you're finished, it's good practice to disconnect from the broker before quitting your program. These are both simple functions that take no parameters.
+Before publishing or subscribing, you must connect your client to the broker. 
+After you're finished, it's good practice to disconnect from the broker before quitting your program. 
+These are both simple functions that take no parameters.
 
 > Definition: `Messaging.connect()`   
 > Returns: Nothing.   
@@ -342,12 +386,15 @@ mqtt.disconnect()
 ```
 ---
 ### Code Services
-Within your system, you may have **Code Services**. These are javascript methods that are run on the ClearBlade Platform rather than locally. To use a code service, all you need is its name.
+Within your system, you may have **Code Services**. 
+These are javascript methods that are run on the ClearBlade Platform rather than locally. 
+To use a code service, all you need is its name.
 
 > Definition: `System.Service(name)`   
 > Returns: Code Service object.
 
-Once you have a code object, you can execute it manually as an authenticated entity (user, device, or developer). If you want to pass the service parameters, you can pass them as a dictionary to the optional second parameter `params`. 
+Once you have a code object, you can execute it manually as an authenticated entity (user, device, or developer). 
+If you want to pass the service parameters, you can pass them as a dictionary to the optional second parameter `params`. 
 
 > Definition: `Service.execute(authenticatedUser, params={}`   
 > Returns: Response from code service.
@@ -378,12 +425,17 @@ code.execute(aaron, params)
 ```
 ---
 ### Queries
-When you fetch data from collections or devices from the device table, you can get more specific results with a **Query**. Note: you must import this module from clearblade.ClearBladeCore, seperately from the System module.
+When you fetch data from collections or devices from the device table, you can get more specific results with a **Query**. 
+Note: you must import this module from clearblade.ClearBladeCore, seperately from the System module.
 
 > Definition: `Query()`   
 > Returns: Query object.
 
-Query objects are built through several function calls to gradually narrow your search down. Each operator function takes the column name you're limiting as its first parameter, and the value you want to limit by as its second. The operator functions don't return anything, they change the query object itself. Applying multiple filters to the same query object is logically ANDing them together. The `matches` operator matches a regular expression.
+Query objects are built through several function calls to gradually narrow your search down. 
+Each operator function takes the column name you're limiting as its first parameter, and the value you want to limit by as its second.
+The operator functions don't return anything, they change the query object itself. 
+Applying multiple filters to the same query object is logically ANDing them together. 
+The `matches` operator matches a regular expression.
 
 * `Query.equalTo(column, value)`
 * `Query.greaterThan(column, value)`
@@ -393,7 +445,9 @@ Query objects are built through several function calls to gradually narrow your 
 * `Query.notEqualTo(column, value`
 * `Query.matches(column, value)`
 
-If you want to logically OR two queries together, you can pass one to the `Or` function. Note that once you OR two queries together, you cannot add any more operators through the previous functions. However, you may OR as many queries together as you'd like.
+If you want to logically OR two queries together, you can pass one to the `Or` function. 
+Note that once you OR two queries together, you cannot add any more operators through the previous functions. 
+However, you may OR as many queries together as you'd like.
 
 > Definition: `Query.Or(query)`   
 > Returns: New query object representing a logical OR of the filters applied to the original two query objects.
@@ -464,21 +518,28 @@ Developer usage is not fully implemented yet and is currently restricted to the 
 
 1. [Devices](#devices-1)
 
-**Developers** have a less restricted access to your system's components. However, developer functionality is not object oriented. Additionally, since a developer may have multiple systems, most functions will require you to pass in a [System](#systems) object. 
+**Developers** have a less restricted access to your system's components. 
+However, developer functionality is not object oriented. 
+Additionally, since a developer may have multiple systems, most functions will require you to pass in a [System](#systems) object. 
 
-If you're not already a developer, you can register yourself from the SDK. You need the typical credentials: first name, last name, organization, email, and password. You will have to import this function directly from `clearblade.ClearBladeCore`.
+If you're not already a developer, you can register yourself from the SDK. 
+You need the typical credentials: first name, last name, organization, email, and password. 
+You will have to import this function directly from `clearblade.ClearBladeCore`.
 
-By default, we assume you're registering on our public domain: "https://platform.clearblade.com". If you're registering elsewhere, you can pass the url as the optional sixth parameter named `url`.
+By default, we assume you're registering on our public domain: "https://platform.clearblade.com". 
+If you're registering elsewhere, you can pass the url as the optional sixth parameter named `url`.
 
 > Definition: `registerDev(fname, lname, org, email, password, url="https://platform.clearblade.com")`   
 > Returns: Developer object.
 
-If you're already a registered developer with the platform, you can log in with your email and password. Like the registration function, if you're logging into an account on a different domain than the default, you can pass it in as the optional third parameter named `url`. 
+If you're already a registered developer with the platform, you can log in with your email and password. 
+Like the registration function, if you're logging into an account on a different domain than the default, you can pass it in as the optional third parameter named `url`. 
 
 > Definition: `Developer(email, password, url="https://platform.clearblade.com")`   
 > Returns: Developer object.
 
-When you create your developer object you will be automatically authenticated. You may then log out and authenticate yourself again as many times as you like with the aptly named functions below. 
+When you create your developer object you will be automatically authenticated. 
+You may then log out and authenticate yourself again as many times as you like with the aptly named functions below. 
 
 > Definition: `Developer.logout()`   
 > Returns: Nothing.
@@ -515,12 +576,15 @@ bigboi = Developer("antwan.a.patton@outkast.com", "th3w@yY0uM0v3")
 ### Devices
 As a developer, you get full CRUD access to the device table. 
 
-To create a device, you need to specify the system it's going to live in, and the name of the device you're creating. There are many other optional parameters that you may set if you please, but all have default values if you're feeling lazy. Note: you should keep enabled set to True and allow at least one type of authentication if you want to interact with the device through the non-developer endpoints.
+To create a device, you need to specify the system it's going to live in, and the name of the device you're creating. 
+There are many other optional parameters that you may set if you please, but all have default values if you're feeling lazy. 
+Note: you should keep enabled set to True and allow at least one type of authentication if you want to interact with the device through the non-developer endpoints.
 
 > Definition: `Developer.newDevice(system, name, enabled=True, type="", state="", active_key="", allow_certificate_auth=False, allow_key_auth=True, certificate="", description="", keys="")`   
 > Returns: Dictionary of the new device's attributes.
 
-You can get a full list of devices in your system's device table and [query](#queries) it if you'd like. If you have a specific device you want information about, you can ask for that device by name. 
+You can get a full list of devices in your system's device table and [query](#queries) it if you'd like. 
+If you have a specific device you want information about, you can ask for that device by name. 
 
 > Definition: `Developer.getDevices(system, query=None)`   
 > Returns: List of devices. Each device is a dictionary of their attributes.
