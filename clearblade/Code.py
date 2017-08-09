@@ -1,19 +1,19 @@
-import Client
-import requests
-import json
+from __future__ import absolute_import
+from . import cbLogs
+from . import restcall
 
-class CodeService():
-	CB_ADDR = "https://rtp.clearblade.com"
-	CODE_PREAMBLE = "/api/v/1/code/"
-	def __init__(self, clientType):
-		self.clientType = clientType
 
-	def CallService(self, name, params, log):
-		creds = {
-			"ClearBlade-SystemSecret" : self.clientType.systemSecret,
-			"ClearBlade-SystemKey" : self.clientType.systemKey,
-			"ClearBlade-UserToken" : self.clientType.UserToken 
-		}
-		if isinstance(self.clientType, Client.UserClient):
-			resp = requests.post(self.CB_ADDR + self.CODE_PREAMBLE + self.clientType.systemKey + "/" + name, data=json.dumps(params), headers=creds)
-			print resp.text
+class Service():
+    def __init__(self, system, name):
+        self.name = name
+        self.url = system.url + "/api/v/1/code/" + system.systemKey + "/" + name
+
+    def execute(self, authenticatedUser, params={}):
+        cbLogs.info("Executing code service", self.name)
+        resp = restcall.post(self.url, headers=authenticatedUser.headers, data=params)
+        return resp
+
+
+class Library():
+    def __init__(self):
+        pass
