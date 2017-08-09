@@ -1,8 +1,8 @@
 from __future__ import print_function, absolute_import
-# set these variables to true to get more info logs
+# set these variables to false to disable the logs
 # (import cbLogs to your project and set it from there)
-DEBUG = False
-MQTT_DEBUG = False
+DEBUG = True
+MQTT_DEBUG = True
 
 
 class prettyText:

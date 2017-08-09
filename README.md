@@ -9,7 +9,8 @@ Both Python 2 and 3 are supported, but all examples written here are in Python 2
 
 ### To install for regular use:
 1. Clone or download this repo on to your machine.
-2. Run `python setup.py install`. # TODO Rob: Required sudo on my machine, is this typical? If so, add a note
+2. Run `python setup.py install`.
+   This may require additional privledges. If it complains, run again with `sudo -H`.
 3. If on Mac, update your SSL libraries `sudo pip install ndg-httpsclient pyasn1 --upgrade --ignore-installed six`
 
 ### To install for development (of the SDK):
@@ -31,19 +32,19 @@ Both Python 2 and 3 are supported, but all examples written here are in Python 2
 The intended entry point for the SDK is the ClearBladeCore module. The beginning of your python file should always include a line like the following:
 
 ```python
-from clearblade.ClearBladeCore import System, Query, Developer, cbLogs
+from clearblade.ClearBladeCore import System, Query, Developer
 ```
 
-System, Query, and Developer are the only three classes you should ever need to import directly into your project, however Query and Developer are only used in special situations. To register a developer, you will need to import the `registerDev` function from ClearBladeCore.
+System, Query, and Developer are the only three classes you should ever need to import directly into your project, however Query and Developer are only used in special situations. To register a developer, you will also need to import the `registerDev` function from ClearBladeCore.
 
-If you want to enable console logging, you must also set the debug flags. The module `cbLogs` has a `DEBUG` flag which enables verbose console messages, and an `MQTT_DEBUG` flag which displays additional logging specifically pertaining to MQTT messaging. 
+By default, we enable verbose console output. If you want your script to be quiet, you can disable the logs with by importing the `cbLogs` module and setting the `DEBUG` and `MQTT_DEBUG` flags to `False`. Note that errors will always be printed, even if the debug flags are set to false. 
 
 ```python
-from clearblade import cbLogs
+from clearblade.ClearBladeCore import cbLogs
 
-# Enable console logging
-cbLogs.DEBUG = True
-cbLogs.MQTT_DEBUG = True
+# Disable console logging
+cbLogs.DEBUG = False
+cbLogs.MQTT_DEBUG = False
 ```
 ---
 ### Systems
@@ -81,8 +82,7 @@ url = "https://customer.clearblade.com"
 mySystem = System(SystemKey, SystemSecret, url)
 ```
 
-```
-A system hosted on a customer platform, such as https://customer.clearblade.com with the auto-logout disabled.
+A system hosted on a customer platform with the auto-logout disabled.
 
 ```python
 from clearblade.ClearBladeCore import System
@@ -94,8 +94,6 @@ url = "https://customer.clearblade.com"
 
 mySystem = System(SystemKey, SystemSecret, url, safe=False)
 ```
-
-
 ---
 ### Users
 Within your System, you may have **User** accounts that can perform actions. Users can be authenticated with their email and password. You may also allow for people to authenticate to your system anonymously. In this case, no email or password is needed. 
@@ -154,7 +152,7 @@ Another common entity that may interact with your system is a **Device**. Simila
 > Definition: `System.Device(name, key)`  
 > Returns: Device object.
 
-Want to get a list of all the devices an authenticated user (or other device, or developer) can view? Simple. We even have a way to query those devices with the optional second parameter called `query`. For more information on this functionality, see [Queries](#queries).
+Want to get a list of all the devices an authenticated entity (user, device, or developer) can view? Simple. We even have a way to query those devices with the optional second parameter called `query`. For more information on this functionality, see [Queries](#queries).
 
 > Definition: `System.getDevices(authenticatedUser, query=None)`  
 > Returns: List of devices. Each device is a dictionary of their attributes. 
@@ -223,7 +221,7 @@ mySystem = System(SystemKey, SystemSecret)
 # Log in as Clark
 clark = mySystem.User("clark@clearblade.com", "h00t13h00")
 
-# Clark accesses the collection 'carolines_guys'
+# Clark accesses the collection carolines_guys
 myCol = mySystem.Collection(clark, collectionName="carolines_guys")
 rows = myCol.getItems()
 
@@ -233,7 +231,7 @@ for row in rows:
 ```
 ---
 ### MQTT Messaging
-Every system has a **Messaging** client you can use to communicate between authenticated entities (evices, users, edges, developers, platforms, so on) using the MQTT protocol. To become an MQTT client, all you need is an authenticated entity. If your MQTT broker uses a different port from the default (1883), you can set it with the optional second parameter `port`. The default keep-alive time is 30 seconds, but you can change that with the optional third parameter `keepalive`. Lastly, if your broker lives at a different url than your system, you can specify that with the optional fourth parameter `url`. 
+Every system has a **Messaging** client you can use to communicate between authenticated entities (devices, users, edges, developers, platforms, so on) using the MQTT protocol. To become an MQTT client, all you need is an authenticated entity (user, device, or developer). If your MQTT broker uses a different port from the default (1883), you can set it with the optional second parameter `port`. The default keep-alive time is 30 seconds, but you can change that with the optional third parameter `keepalive`. Lastly, if your broker lives at a different url than your system, you can specify that with the optional fourth parameter `url`. 
 
 > Definition: `System.Messaging(user, port=1883, keepalive=30, url="")`   
 > Returns: MQTT Messaging object.
@@ -246,9 +244,6 @@ There are a slew of callback functions you may assign. Typically, you want to se
 - `on_publish(client, userdata, mid)`   
 - `on_message(client, userdata, mid)`   
 - `on_log(client, userdata, level, buf)`   
-
-# TODO Do any of these behave like the previous SDK's #processMessage
-# which blocked until received message, processed then unblocked, and repeated? We have a need for longstanding pythons scripts that use this logic
 
 Before publishing or subscribing, you must connect your client to the broker. After you're finished, it's good practice to disconnect from the broker before quitting your program. These are both simple functions that take no parameters.
 
@@ -301,10 +296,10 @@ def on_message(client, userdata, message):
 mqtt.on_connect = on_connect
 mqtt.on_message = on_message
 
-# Connect and spin for 30 seconds before disconnecting
+# Connect and wait for messages
 mqtt.connect()
-time.sleep(30)
-mqtt.disconnect()
+while(True):
+    time.sleep(1)  # spin
 ```
 Publish messages to a channel.
 
@@ -352,7 +347,7 @@ Within your system, you may have **Code Services**. These are javascript methods
 > Definition: `System.Service(name)`   
 > Returns: Code Service object.
 
-Once you have a code object, you can execute it manually as an authenticated user (or device, or developer). If you want to pass the service parameters, you can pass them as a dictionary to the optional second parameter `params`. 
+Once you have a code object, you can execute it manually as an authenticated entity (user, device, or developer). If you want to pass the service parameters, you can pass them as a dictionary to the optional second parameter `params`. 
 
 > Definition: `Service.execute(authenticatedUser, params={}`   
 > Returns: Response from code service.
@@ -419,13 +414,13 @@ mySystem = System(SystemKey, SystemSecret)
 michael = mySystem.User("michael@clearblade.com", "sk3wIt0nTh3B@r-B")
 
 # Michael accesses the collection OutKast_Songs
-songs = mySystem.Collection(michael, "OutKast_Songs")
+songs = mySystem.Collection(michael, collectionName="OutKast_Songs")
 
-# We only want songs from the album Aquemini, with a length between 180-220 seconds
+# We only want songs from the album Aquemini, with a song length between 180-220 seconds
 q = Query()
 q.equalTo("album", "Aquemini")
-q.greaterThan("length", 180)
-q.lessThat("length", 220)
+q.greaterThan("song_length", 180)
+q.lessThat("song_length", 220)
 
 # Fetch rows that fit our query filters
 rows = myCol.getItems(q)
