@@ -7,7 +7,13 @@ Both Python 2 and 3 are supported, but all examples written here are in Python 2
 
 ## Installation
 
-### To install for regular use:
+### To install:
+1. Run `pip install clearblade`.
+   If you get a permissions error, run `sudo -H pip install clearblade`.
+2. If on Mac, you may need to update your SSL libraries. 
+   If your connections are failing, try: `sudo pip install ndg-httpsclient pyasn1 --upgrade --ignore-installed six`
+
+### To install from source:
 1. Clone or download this repo on to your machine.
 2. Run `python setup.py install`.
    This may require additional priviledges. 
