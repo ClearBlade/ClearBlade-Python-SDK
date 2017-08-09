@@ -61,7 +61,7 @@ On the ClearBlade platform, you develop IoT solutions through **Systems**.
 Systems are identified by their SystemKey and SystemSecret. 
 These are the only two parameters needed to work with your system. 
 
-By default, we assume your system lives on our public domain: "https://platform.clearblade.com". 
+By default, we assume your system lives on our public domain: "https&#8203;://platform.clearblade.com". 
 If your system lives elsewhere, you can pass the url as the optional third parameter named `url`.
 
 Also by default, we automatically log out any users you authenticate when your script exits. 
@@ -84,7 +84,7 @@ SystemSecret = "9ABBD2970BA6AABFE6E8AEB8B14F"
 
 mySystem = System(SystemKey, SystemSecret)
 ```
-A system hosted on a customer platform, such as https://customer.clearblade.com
+A system hosted on a customer platform, such as https&#8203;://customer.clearblade.com
 
 ```python
 from clearblade.ClearBladeCore import System
@@ -526,7 +526,7 @@ If you're not already a developer, you can register yourself from the SDK.
 You need the typical credentials: first name, last name, organization, email, and password. 
 You will have to import this function directly from `clearblade.ClearBladeCore`.
 
-By default, we assume you're registering on our public domain: "https://platform.clearblade.com". 
+By default, we assume you're registering on our public domain: "https&#8203;://platform.clearblade.com". 
 If you're registering elsewhere, you can pass the url as the optional sixth parameter named `url`.
 
 > Definition: `registerDev(fname, lname, org, email, password, url="https://platform.clearblade.com")`   
