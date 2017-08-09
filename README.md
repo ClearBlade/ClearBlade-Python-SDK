@@ -10,7 +10,7 @@ Both Python 2 and 3 are supported, but all examples written here are in Python 2
 ### To install for regular use:
 1. Clone or download this repo on to your machine.
 2. Run `python setup.py install`.
-   This may require additional privledges. 
+   This may require additional priviledges. 
    If it complains, run again with `sudo -H`.
 3. If on Mac, you may need to update your SSL libraries. 
    If your connections are failing, try: `sudo pip install ndg-httpsclient pyasn1 --upgrade --ignore-installed six`
@@ -343,7 +343,7 @@ mqtt.on_message = on_message
 # Connect and wait for messages
 mqtt.connect()
 while(True):
-    time.sleep(1)  # spin
+    time.sleep(1)  # wait for messages
 ```
 Publish messages to a channel.
 
