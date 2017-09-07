@@ -111,6 +111,27 @@ class Messaging:
         if self.on_log:
             self.on_log(client, userdata, level, buf)
 
+    def set_on_connect(self, callback):
+        self.on_connect = callback
+
+    def set_on_disconnect(self, callback):
+        self.on_disconnect = callback
+
+    def set_on_subscribe(self, callback):
+        self.on_subscribe = callback
+
+    def set_on_unsubscribe(self, callback):
+        self.on_unsubscribe = callback
+
+    def set_on_publish(self, callback):
+        self.on_publish = callback
+
+    def set_on_message(self, callback):
+        self.on_message = callback
+
+    def set_on_log(self, callback):
+        self.on_log = callback
+
     def connect(self):
         cbLogs.info("Connecting to MQTT.")
         self.__mqttc.connect(self.__url, self.__port, self.__keepalive)
