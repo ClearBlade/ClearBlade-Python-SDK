@@ -9,7 +9,7 @@ def registerUser(system, authenticatedUser, email, password):
         "password": password
     }
     cbLogs.info("Registering", email + "...")
-    resp = restcall.post(authenticatedUser.url + "/reg", headers=authenticatedUser.headers, data=newUserCredentials, silent=True)
+    resp = restcall.post(authenticatedUser.url + "/reg", headers=authenticatedUser.headers, data=newUserCredentials, silent=True, sslVerify=system.sslVerify)
     try:
         newUser = User(system, email, password)
         newUser.token = str(resp["user_token"])
@@ -37,10 +37,10 @@ class AnonUser(object):
         self.headers.pop("ClearBlade-UserToken", None)
         try:
             cbLogs.info("Authenticating", self.credentials["email"], "as a user...")
-            resp = restcall.post(self.url + "/auth", headers=self.headers, data=self.credentials)
+            resp = restcall.post(self.url + "/auth", headers=self.headers, data=self.credentials, sslVerify=self.system.sslVerify)
         except AttributeError:
             cbLogs.info("Authenticating as anonymous...")
-            resp = restcall.post(self.url + "/anon", headers=self.headers)
+            resp = restcall.post(self.url + "/anon", headers=self.headers, sslVerify=self.system.sslVerify)
         self.token = str(resp["user_token"])
         self.headers["ClearBlade-UserToken"] = self.token
         if self not in self.system.users:
@@ -48,7 +48,7 @@ class AnonUser(object):
         cbLogs.info("Successfully authenticated!")
 
     def logout(self):
-        restcall.post(self.url + "/logout", headers=self.headers)
+        restcall.post(self.url + "/logout", headers=self.headers, sslVerify=self.system.sslVerify)
         if self in self.system.users:
             self.system.users.remove(self)
         try:
@@ -57,7 +57,7 @@ class AnonUser(object):
             cbLogs.info("Anonymous user has been logged out.")
 
     def checkAuth(self):
-        resp = restcall.post(self.url + "/checkauth", headers=self.headers, silent=True)
+        resp = restcall.post(self.url + "/checkauth", headers=self.headers, silent=True, sslVerify=self.system.sslVerify)
         try:
             return resp["is_authenticated"]
         except TypeError:

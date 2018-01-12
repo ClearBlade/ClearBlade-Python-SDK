@@ -18,6 +18,7 @@ class Collection():
         self.nextPageURL = None
         self.prevPageURL = None
         self.items = []
+        self.sslVerify = system.sslVerify
 
     def getItems(self, query=None, pagesize=100, pagenum=1, url=""):
         url = self.url + url
@@ -29,7 +30,7 @@ class Collection():
             params["FILTERS"] = query.filters
             params["SORT"] = query.sorting
 
-        resp = restcall.get(url, headers=self.headers, params={"query": json.dumps(params)})
+        resp = restcall.get(url, headers=self.headers, params={"query": json.dumps(params)}, sslVerify=self.sslVerify)
 
         self.currentPage = resp["CURRENTPAGE"]
         self.nextPageURL = resp["NEXTPAGEURL"]
@@ -57,14 +58,14 @@ class Collection():
             cbLogs.info("No previous page!")
 
     def createItem(self, data):
-        return restcall.post(self.url, headers=self.headers, data=data)
+        return restcall.post(self.url, headers=self.headers, data=data, sslVerify=self.sslVerify)
 
     def updateItems(self, query, data):
         payload = {
             "query": query.filters,
             "$set": data
         }
-        return restcall.put(self.url, headers=self.headers, data=payload)
+        return restcall.put(self.url, headers=self.headers, data=payload, sslVerify=self.sslVerify)
 
     def deleteItems(self, query):
-        return restcall.delete(self.url, headers=self.headers, params={"query": json.dumps(query.filters)})
+        return restcall.delete(self.url, headers=self.headers, params={"query": json.dumps(query.filters)}, sslVerify=self.sslVerify)

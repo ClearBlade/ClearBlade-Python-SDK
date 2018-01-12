@@ -18,7 +18,7 @@ class System:
         while self.users:
             self.users.pop(0).logout()
 
-    def __init__(self, systemKey, systemSecret, url="https://platform.clearblade.com", safe=True):
+    def __init__(self, systemKey, systemSecret, url="https://platform.clearblade.com", safe=True, sslVerify=True):
         self.systemKey = systemKey
         self.systemSecret = systemSecret
         self.url = url
@@ -26,6 +26,9 @@ class System:
         self.collections = []
         self.messagingClients = []
         self.devices = []
+        self.sslVerify = sslVerify
+        if not sslVerify:
+            cbLogs.warn("You have disabled SSL verification, this should only be done if your ClearBlade Platform instance is leveraging self signed SSL certificates.")
         if safe:
             atexit.register(self.__exitcode)
 
