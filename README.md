@@ -37,6 +37,7 @@ Both Python 2 and 3 are supported, but all examples written here are in Python 2
 1. [Code Services](#code-services)
 1. [Queries](#queries)
 1. [Developers](#developer-usage)
+1. [Advanced](#advanced-usage)
 
 ---
 ### Introduction
@@ -650,3 +651,22 @@ tdb = devKev.getDevice(mySystem, "TwoDopeBoyz")
 if tdb["description"] != "(In a Cadillac)":
     devKev.deleteDevice(mySystem, "TwoDopeBoyz")
 ```
+---
+## Advanced Usage
+
+### SSL Verification
+If you need to disable SSL verification (likely in the case of a self-signed SSL certificate), you simply need to initialize a System like you normally would, and include a `sslVerify=True` parameter.
+
+#### Examples
+```python
+from clearblade.ClearBladeCore import System
+
+# System credentials
+SystemKey = "9abbd2970baabf8aa6d2a9abcc47"
+SystemSecret = "9ABBD2970BA6AABFE6E8AEB8B14F"
+url = "https://customer.clearblade.com"
+
+mySystem = System(SystemKey, SystemSecret, url, sslVerify=False)
+```
+
+**Note** This option should only be enabled when using a ClearBlade Platform instance with a self-signed SSL certificate. If your instance is using a valid SSL certificate signed with a known CA, you should **not** enable this.
