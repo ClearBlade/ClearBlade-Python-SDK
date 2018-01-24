@@ -13,13 +13,13 @@ def getDevices(system, authenticatedUser, query=None):
     else:
         params = ""
     url = system.url + "/api/v/2/devices/" + system.systemKey
-    resp = restcall.get(url, headers=authenticatedUser.headers, params=params)
+    resp = restcall.get(url, headers=authenticatedUser.headers, params=params, sslVerify=system.sslVerify)
     return resp
 
 
 def getDevice(system, authenticatedUser, name):
     url = system.url + "/api/v/2/devices/" + system.systemKey + "/" + name
-    resp = restcall.get(url, headers=authenticatedUser.headers)
+    resp = restcall.get(url, headers=authenticatedUser.headers, sslVerify=system.sslVerify)
     return resp
 
 
@@ -46,7 +46,7 @@ class Device:
             "deviceName": self.name,
             "activeKey": key
         }
-        resp = restcall.post(self.url + "/auth", headers=self.headers, data=credentials)
+        resp = restcall.post(self.url + "/auth", headers=self.headers, data=credentials, sslVerify=self.system.sslVerify)
         self.token = str(resp["deviceToken"])
         self.headers["ClearBlade-DeviceToken"] = self.token
         cbLogs.info("Successfully authenticated!")
@@ -57,7 +57,7 @@ class Device:
             json.loads(payload)
         except TypeError:
             payload = json.dumps(payload)
-        restcall.put(self.url + "/" + self.name, headers=self.headers, data=payload)
+        restcall.put(self.url + "/" + self.name, headers=self.headers, data=payload, sslVerify=self.system.sslVerify)
         cbLogs.info("Successfully updated", self.name)
 
 
@@ -79,7 +79,7 @@ def DEVnewDevice(developer, system, name, enabled=True, type="", state="", activ
         "state": state,
         "type": type
     }
-    resp = restcall.post(url, headers=developer.headers, data=data)
+    resp = restcall.post(url, headers=developer.headers, data=data, sslVerify=system.sslVerify)
     cbLogs.info("Successfully created", name, "as a device.")
     return resp
 
@@ -93,25 +93,25 @@ def DEVgetDevices(developer, system, query=None):
     else:
         params = ""
     url = system.url + "/api/v/2/devices/" + system.systemKey
-    resp = restcall.get(url, headers=developer.headers, params=params)
+    resp = restcall.get(url, headers=developer.headers, params=params, sslVerify=system.sslVerify)
     return resp
 
 
 def DEVgetDevice(developer, system, name):
     url = system.url + "/api/v/2/devices/" + system.systemKey + "/" + name
-    resp = restcall.get(url, headers=developer.headers)
+    resp = restcall.get(url, headers=developer.headers, sslVerify=system.sslVerify)
     return resp
 
 
 def DEVupdateDevice(developer, system, name, updates):
     url = system.url + "/api/v/2/devices/" + system.systemKey + "/" + name
-    resp = restcall.put(url, headers=developer.headers, data=updates)
+    resp = restcall.put(url, headers=developer.headers, data=updates, sslVerify=system.sslVerify)
     cbLogs.info("Successfully updated device:", name + ".")
     return resp
 
 
 def DEVdeleteDevice(developer, system, name):
     url = system.url + "/api/v/2/devices/" + system.systemKey + "/" + name
-    resp = restcall.delete(url, headers=developer.headers)
+    resp = restcall.delete(url, headers=developer.headers, sslVerify=system.sslVerify)
     cbLogs.info("Successfully deleted device:", name + ".")
     return resp

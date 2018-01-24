@@ -23,6 +23,9 @@ def error(*args):
     # Errors should always be shown
     print(prettyText.bold + prettyText.red + "CB Error:" + prettyText.endColor, " ".join(args))
 
+def warn(*args):
+    # Warnings should always be shown
+    print(prettyText.bold + prettyText.yellow + "CB Warning: " + prettyText.endColor, " ".join(args))
 
 def info(*args):
     if DEBUG:  # extra info should not always be shown

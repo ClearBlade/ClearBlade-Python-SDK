@@ -24,10 +24,10 @@ def panicmessage(resp, reqtype, url, headers, params="", data=""):
     print("")
 
 
-def get(url, headers={}, params={}, silent=False):
+def get(url, headers={}, params={}, silent=False, sslVerify=True):
     # try our request
     try:
-        resp = requests.get(url, headers=headers, params=params)
+        resp = requests.get(url, headers=headers, params=params, verify=sslVerify)
     except ConnectionError:
         cbLogs.error("Connection error. Check that", url, "is up and accepting requests.")
         exit(-1)
@@ -46,7 +46,7 @@ def get(url, headers={}, params={}, silent=False):
     return resp
 
 
-def post(url, headers={}, data={}, silent=False):
+def post(url, headers={}, data={}, silent=False, sslVerify=True):
     # make sure our data is valid json
     try:
         json.loads(data)
@@ -55,7 +55,7 @@ def post(url, headers={}, data={}, silent=False):
 
     # try our request
     try:
-        resp = requests.post(url, headers=headers, data=data)
+        resp = requests.post(url, headers=headers, data=data, verify=sslVerify)
     except ConnectionError:
         cbLogs.error("Connection error. Check that", url, "is up and accepting requests.")
         exit(-1)
@@ -74,7 +74,7 @@ def post(url, headers={}, data={}, silent=False):
     return resp
 
 
-def put(url, headers={}, data={}, silent=False):
+def put(url, headers={}, data={}, silent=False, sslVerify=True):
     # make sure our data is valid json
     try:
         json.loads(data)
@@ -83,7 +83,7 @@ def put(url, headers={}, data={}, silent=False):
 
     # try our request
     try:
-        resp = requests.put(url, headers=headers, data=data)
+        resp = requests.put(url, headers=headers, data=data, verify=sslVerify)
     except ConnectionError:
         cbLogs.error("Connection error. Check that", url, "is up and accepting requests.")
         exit(-1)
@@ -102,10 +102,10 @@ def put(url, headers={}, data={}, silent=False):
     return resp
 
 
-def delete(url, headers={}, params={}, silent=False):
+def delete(url, headers={}, params={}, silent=False, sslVerify=True):
     # try our request
     try:
-        resp = requests.delete(url, headers=headers, params=params)
+        resp = requests.delete(url, headers=headers, params=params, verify=sslVerify)
     except ConnectionError:
         cbLogs.error("Connection error. Check that", url, "is up and accepting requests.")
         exit(-1)

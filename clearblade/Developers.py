@@ -30,7 +30,7 @@ def registerDev(fname, lname, org, email, password, url="https://platform.clearb
 
 
 class Developer:
-    def __init__(self, email, password, url="https://platform.clearblade.com"):
+    def __init__(self, email, password, url="https://platform.clearblade.com", sslVerify=True):
         self.credentials = {
             "email": email,
             "password": password
@@ -41,17 +41,20 @@ class Developer:
         }
         self.url = url
         self.token = ""
+        self.sslVerify = sslVerify
+        if not sslVerify:
+            cbLogs.warn("You have disabled SSL verification, this should only be done if your ClearBlade Platform instance is leveraging self signed SSL certificates.")
         self.authenticate()
 
     def authenticate(self):
         cbLogs.info("Authenticating", self.credentials["email"], "as a developer...")
-        resp = restcall.post(self.url + "/admin/auth", headers=self.headers, data=self.credentials)
+        resp = restcall.post(self.url + "/admin/auth", headers=self.headers, data=self.credentials, sslVerify=self.sslVerify)
         self.token = str(resp["dev_token"])
         self.headers["ClearBlade-DevToken"] = self.token
         cbLogs.info("Successfully authenticated!")
 
     def logout(self):
-        restcall.post(self.url + "/admin/logout", headers=self.headers)
+        restcall.post(self.url + "/admin/logout", headers=self.headers, sslVerify=self.sslVerify)
         if self in self.system.users:
             self.system.users.remove(self)
         cbLogs.info(self.credentials["email"], "(developer) has been logged out.")
