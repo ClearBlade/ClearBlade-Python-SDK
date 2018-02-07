@@ -8,8 +8,12 @@ class Collection():
     def __init__(self, system, authenticatedUser, collectionID="", collectionName=""):
         if collectionID:
             self.url = system.url + '/api/v/1/data/' + collectionID
+            self.collectionID = collectionID
+            self.collectionName = None
         elif collectionName:
             self.url = system.url + '/api/v/1/collection/' + system.systemKey + "/" + collectionName
+            self.collectionName = collectionName
+            self.collectionID = None
         else:
             cbLogs.error("You must supply either a collection name or id.")  # beep
             exit(-1)
@@ -69,3 +73,37 @@ class Collection():
 
     def deleteItems(self, query):
         return restcall.delete(self.url, headers=self.headers, params={"query": json.dumps(query.filters)}, sslVerify=self.sslVerify)
+
+
+###########################
+#   DEVELOPER ENDPOINTS   #
+###########################
+
+def DEVnewCollection(developer, system, name):
+    url = system.url + "/admin/collectionmanagement"
+    data = {
+        "appID": system.systemKey,
+        "name": name
+    }
+    resp = restcall.post(url, headers=developer.headers, data=data, sslVerify=system.sslVerify)
+    cbLogs.info("Successfully created collection: " + name)
+    newCollection = Collection(system, developer, collectionID=resp["collectionID"])
+    return newCollection
+
+def DEVaddColumnToCollection(developer, system, collection, columnName, columnType):
+    if not collection.collectionID:
+        cbLogs.error("You must supply the collection id when adding a column to a collection.")
+        exit(-1)
+    url = system.url + "/admin/collectionmanagement"
+    data = {
+        "id": collection.collectionID,
+        "addColumn": {
+            "id": collection.collectionID,
+            "name": columnName,
+            "type": columnType
+        }
+    }
+    resp = restcall.put(url, headers=developer.headers, data=data, sslVerify=system.sslVerify)
+    cbLogs.info("Successfully added column: " + columnName)
+    return resp
+
