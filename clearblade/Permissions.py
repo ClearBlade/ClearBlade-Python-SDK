@@ -2,12 +2,11 @@ from __future__ import absolute_import
 from . import cbLogs
 from . import restcall
 
-class Permissions:
-    READ = 1
-    CREATE = 2
-    UPDATE = 4
-    DELETE = 8
 
+READ = 1
+CREATE = 2
+UPDATE = 4
+DELETE = 8
 
 ###########################
 #   DEVELOPER ENDPOINTS   #
