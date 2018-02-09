@@ -79,6 +79,14 @@ class Collection():
 #   DEVELOPER ENDPOINTS   #
 ###########################
 
+def DEVgetAllCollections(developer, system):
+    url = system.url + "/admin/allcollections"
+    params = {
+        "appid": system.systemKey
+    }
+    resp = restcall.get(url, headers=developer.headers, params=params, sslVerify=system.sslVerify)
+    return resp
+
 def DEVnewCollection(developer, system, name):
     url = system.url + "/admin/collectionmanagement"
     data = {
@@ -87,8 +95,7 @@ def DEVnewCollection(developer, system, name):
     }
     resp = restcall.post(url, headers=developer.headers, data=data, sslVerify=system.sslVerify)
     cbLogs.info("Successfully created collection: " + name)
-    newCollection = Collection(system, developer, collectionID=resp["collectionID"])
-    return newCollection
+    return Collection(system, developer, collectionID=resp["collectionID"])
 
 def DEVaddColumnToCollection(developer, system, collection, columnName, columnType):
     if not collection.collectionID:

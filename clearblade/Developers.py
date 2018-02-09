@@ -70,6 +70,9 @@ class Developer:
     #  Collections  #
     #################
 
+    def getAllCollections(self, system):
+        return Collections.DEVgetAllCollections(self, system)
+
     def newCollection(self, system, name):
         return Collections.DEVnewCollection(self, system, name)
 
