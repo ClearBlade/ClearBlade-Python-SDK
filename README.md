@@ -581,8 +581,12 @@ bigboi = Developer("antwan.a.patton@outkast.com", "th3w@yY0uM0v3")
 ```
 ---
 ### Collections
-As a developer, you get full management access to any collection within a system. 
-To create a cloud collection, you need to specify the system it's going to line in, and the name of the new collection you are creating.
+First you are able to get a list of all current collections within a system.
+
+> Definition: `Developer.getAllCollections(system)`  
+> Returns: List of collections. Each collection is a dictionary containing the collection name and collectionID.  
+
+As a developer, you get full management access to any collection within a system. To create a cloud collection, you need to specify the system it's going to live in, and the name of the new collection you are creating.
 
 > Definition: `Developer.newCollection(system, name)`  
 > Returns: A Collection object of the newly created Collection
