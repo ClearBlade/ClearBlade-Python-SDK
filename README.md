@@ -580,6 +580,71 @@ from clearblade.ClearBladeCore import Developer
 bigboi = Developer("antwan.a.patton@outkast.com", "th3w@yY0uM0v3")
 ```
 ---
+### Collections
+First you are able to get a list of all current collections within a system.
+
+> Definition: `Developer.getAllCollections(system)`  
+> Returns: List of collections. Each collection is a dictionary containing the collection name and collectionID.  
+
+As a developer, you get full management access to any collection within a system. To create a cloud collection, you need to specify the system it's going to live in, and the name of the new collection you are creating.
+
+> Definition: `Developer.newCollection(system, name)`  
+> Returns: A Collection object of the newly created Collection
+
+You can also add columns to any Collection. Note: the Collection object you supply should be initialized with a `collectionID` (rather than `collectionName`) in order to add columns. The Collection object returned from `Developer.newCollection` is initialized this way for you for ease of use.
+
+> Definition: `Developer.addColumnToCollection(system, collectionObject, columnName, columnType)`  
+> Returns: Nothing
+
+Finally, you are able to set the CRUD permissions for a collection via a specific role name. Note: like `addColumnToCollection` you will need to use a Collection object initialized with a `collectionID`
+
+> Definition: `Developer.setPermissionsForCollection(system, collectionObject, Permissions.READ + Permissions.UPDATE, roleName)`  
+> Returns: Nothing
+
+#### Examples
+Creating a new Collection and adding a custom column.
+
+```python
+from clearblade.ClearBladeCore import System, Developer
+
+# System credentials
+SystemKey = "9abbd2970baabf8aa6d2a9abcc47"
+SystemSecret = "9ABBD2970BA6AABFE6E8AEB8B14F"
+
+mySystem = System(SystemKey, SystemSecret)
+
+# Log in as Steve
+steve = Developer("steve@clearblade.com", "r0s@_p@rks")
+
+# Create new Collection named Tools
+toolsCollection = steve.newCollection(mySystem, "Tools")
+
+# Add a column to the collection called last_location with a type of string
+steve.addColumnToCollection(mySystem, toolsCollection, "last_location", "string")
+```
+
+Updating CRUD permissions for a Collection on a specific role.
+
+```python
+from clearblade.ClearBladeCore import System, Developer, Collections, Permissions
+
+# System credentials
+SystemKey = "9abbd2970baabf8aa6d2a9abcc47"
+SystemSecret = "9ABBD2970BA6AABFE6E8AEB8B14F"
+
+mySystem = System(SystemKey, SystemSecret)
+
+# Log in as Steve
+steve = Developer("steve@clearblade.com", "r0s@_p@rks")
+
+# Create a Collection object from an existing collection with an id of 8a94dda70bb4c2c59b8298d686f401
+collectionObj = mySystem.Collection(steve, collectionID="8a94dda70bb4c2c59b8298d686f401")
+
+# Give the Authenticated role Read and Delete permissions to this collection
+michael.setPermissionsForCollection(mySystem, collectionObj, Permissions.READ + Permissions.DELETE, "Authenticated")
+```
+
+---
 ### Devices
 As a developer, you get full CRUD access to the device table. 
 

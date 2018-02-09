@@ -1,8 +1,9 @@
 from __future__ import absolute_import
 from . import restcall
 from . import cbLogs
+from . import Collections
 from . import Devices
-
+from . import Permissions
 
 def registerDev(fname, lname, org, email, password, url="https://platform.clearblade.com"):
     newDevCredentials = {
@@ -65,6 +66,19 @@ class Developer:
     # ~~~~~~~~~~~~~~~~~~~~~~ #
     ##########################
 
+    #################
+    #  Collections  #
+    #################
+
+    def getAllCollections(self, system):
+        return Collections.DEVgetAllCollections(self, system)
+
+    def newCollection(self, system, name):
+        return Collections.DEVnewCollection(self, system, name)
+
+    def addColumnToCollection(self, system, collection, columnName, columnType):
+        return Collections.DEVaddColumnToCollection(self, system, collection, columnName, columnType)
+
     ###############
     #   Devices   #
     ###############
@@ -83,3 +97,11 @@ class Developer:
 
     def deleteDevice(self, system, name):
         return Devices.DEVdeleteDevice(self, system, name)
+
+    #################
+    #  Permissions  #
+    #################
+
+    def setPermissionsForCollection(self, system, collection, permissionsLevel, roleName):
+        return Permissions.DEVsetPermissionsForCollection(self, system, collection, permissionsLevel, roleName)
+
