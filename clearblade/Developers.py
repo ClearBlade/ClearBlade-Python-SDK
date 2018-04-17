@@ -5,7 +5,7 @@ from . import Collections
 from . import Devices
 from . import Permissions
 
-def registerDev(fname, lname, org, email, password, url="https://platform.clearblade.com"):
+def registerDev(fname, lname, org, email, password, url="https://platform.clearblade.com", registrationKey="", sslVerify=True):
     newDevCredentials = {
         "fname": fname,
         "lname": lname,
@@ -13,14 +13,16 @@ def registerDev(fname, lname, org, email, password, url="https://platform.clearb
         "email": email,
         "password": password
     }
+    if registrationKey != "":
+        newDevCredentials["key"] = registrationKey
     headers = {
         "Accept": "application/json",
         "Content-Type": "application/json"
     }
     cbLogs.info("Registering", email, "as a developer...")
-    resp = restcall.post(url + '/admin/reg', headers=headers, data=newDevCredentials)
+    resp = restcall.post(url + '/admin/reg', headers=headers, data=newDevCredentials, sslVerify=sslVerify)
     try:
-        newDev = Developer(email, password, url)
+        newDev = Developer(email, password, url, sslVerify=sslVerify, authOnCreate=False)
         newDev.token = str(resp["dev_token"])
         newDev.headers["ClearBlade-DevToken"] = newDev.token
         cbLogs.info("Successfully registered", email, "as a developer!")
@@ -31,7 +33,7 @@ def registerDev(fname, lname, org, email, password, url="https://platform.clearb
 
 
 class Developer:
-    def __init__(self, email, password, url="https://platform.clearblade.com", sslVerify=True):
+    def __init__(self, email, password, url="https://platform.clearblade.com", sslVerify=True, authOnCreate=True):
         self.credentials = {
             "email": email,
             "password": password
@@ -45,7 +47,8 @@ class Developer:
         self.sslVerify = sslVerify
         if not sslVerify:
             cbLogs.warn("You have disabled SSL verification, this should only be done if your ClearBlade Platform instance is leveraging self signed SSL certificates.")
-        self.authenticate()
+        if authOnCreate:
+            self.authenticate()
 
     def authenticate(self):
         cbLogs.info("Authenticating", self.credentials["email"], "as a developer...")
