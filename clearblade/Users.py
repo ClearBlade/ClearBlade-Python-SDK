@@ -9,7 +9,13 @@ def registerUser(system, authenticatedUser, email, password):
         "password": password
     }
     cbLogs.info("Registering", email + "...")
-    resp = restcall.post(authenticatedUser.url + "/reg", headers=authenticatedUser.headers, data=newUserCredentials, silent=True, sslVerify=system.sslVerify)
+    url = authenticatedUser.url
+    # we allow the authenticatedUser to be a developer, device, or user. however there a developer specific endpoint for creating users, so we need some logic here to build the correct url
+    if "/api/v/1/user" not in url and "/api/v/2/devices" not in url:
+        url += "/admin/user/" + system.systemKey
+    else:
+        url += "/reg"
+    resp = restcall.post(url, headers=authenticatedUser.headers, data=newUserCredentials, sslVerify=system.sslVerify)
     try:
         newUser = User(system, email, password)
         newUser.token = str(resp["user_token"])
