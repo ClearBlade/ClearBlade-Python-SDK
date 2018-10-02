@@ -23,9 +23,9 @@ def parse_url(url):
 
 
 class Messaging:
-    def __init__(self, user=None, port=1883, keepalive=30, url=""):
+    def __init__(self, user=None, port=1883, keepalive=30, url="", client_id=""):
         # mqtt client
-        self.__mqttc = mqtt.Client()
+        self.__mqttc = mqtt.Client(client_id=client_id)
         self.__mqttc.username_pw_set(user.token, user.system.systemKey)
 
         # default callback functions
