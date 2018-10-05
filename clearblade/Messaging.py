@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 import paho.mqtt.client as mqtt
+import uuid
 from . import cbLogs
 
 
@@ -25,7 +26,7 @@ def parse_url(url):
 class Messaging:
     def __init__(self, user=None, port=1883, keepalive=30, url="", client_id=""):
         # mqtt client
-        self.__mqttc = mqtt.Client(client_id=client_id)
+        self.__mqttc = (client_id != "" and mqtt.Client(client_id=client_id)) or mqtt.Client(client_id=uuid.uuid4().hex)
         self.__mqttc.username_pw_set(user.token, user.system.systemKey)
 
         # default callback functions

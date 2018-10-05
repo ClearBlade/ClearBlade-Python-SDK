@@ -277,9 +277,11 @@ Every system has a **Messaging** client you can use to communicate between authe
 To become an MQTT client, all you need is an authenticated entity (user, device, or developer). 
 If your MQTT broker uses a different port from the default (1883), you can set it with the optional second parameter `port`. 
 The default keep-alive time is 30 seconds, but you can change that with the optional third parameter `keepalive`. 
-Lastly, if your broker lives at a different url than your system, you can specify that with the optional fourth parameter `url`. 
+If your broker lives at a different url than your system, you can specify that with the optional fourth parameter `url`. 
+Lastly, you can specify the client_id your script will connect to the broker with using the optional fifth parameter `client_id`.
+If you don't specify a client_id, the SDK will use a random hex string.
 
-> Definition: `System.Messaging(user, port=1883, keepalive=30, url="")`   
+> Definition: `System.Messaging(user, port=1883, keepalive=30, url="", client_id="")`   
 > Returns: MQTT Messaging object.
 
 There are a slew of callback functions you may assign. 
