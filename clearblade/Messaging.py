@@ -24,7 +24,7 @@ def parse_url(url):
 
 
 class Messaging:
-    def __init__(self, user=None, port=1883, keepalive=30, url="", client_id=""):
+    def __init__(self, user=None, port=1883, keepalive=30, url="", client_id="", use_tls=False):
         # mqtt client
         self.__mqttc = (client_id != "" and mqtt.Client(client_id=client_id)) or mqtt.Client(client_id=uuid.uuid4().hex)
         self.__mqttc.username_pw_set(user.token, user.system.systemKey)
@@ -58,6 +58,7 @@ class Messaging:
         self.__port = port
         self.__keepalive = keepalive
         self.__qos = 0
+        self.__use_tls = use_tls
 
     def __connect_cb(self, client, userdata, flags, rc):
         if rc == 0:
@@ -114,6 +115,8 @@ class Messaging:
 
     def connect(self):
         cbLogs.info("Connecting to MQTT.")
+        if self.__use_tls:
+            self.__mqttc.tls_set()
         self.__mqttc.connect(self.__url, self.__port, self.__keepalive)
         self.__mqttc.loop_start()
 
