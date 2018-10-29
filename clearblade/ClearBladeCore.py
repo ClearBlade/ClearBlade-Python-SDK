@@ -84,8 +84,8 @@ class System:
     #   MQTT   #
     ############
 
-    def Messaging(self, user, port=1883, keepalive=30, url="", client_id=""):
-        msg = Messaging.Messaging(user, port, keepalive, url, client_id=client_id)
+    def Messaging(self, user, port=1883, keepalive=30, url="", client_id="", use_tls=False):
+        msg = Messaging.Messaging(user, port, keepalive, url, client_id=client_id, use_tls=use_tls)
         self.messagingClients.append(msg)
         return msg
 
