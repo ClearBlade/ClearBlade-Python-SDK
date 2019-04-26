@@ -305,20 +305,20 @@ These are both simple functions that take no parameters.
 > Definition: `Messaging.disconnect()`   
 > Returns: Nothing.   
 
-You can subscribe to as many channels as you like, and subsequently unsubscribe from them, using the following two commands. 
+You can subscribe to as many topics as you like, and subsequently unsubscribe from them, using the following two commands. 
 
-> Definition: `Messaging.subscribe(channel)`   
+> Definition: `Messaging.subscribe(topic)`   
 > Returns: Nothing.   
-> Definition: `Messaging.unsubscribe(channel)`   
+> Definition: `Messaging.unsubscribe(topic)`   
 > Returns: Nothing.
 
-Lastly, publishing takes the channel to publish to, and the message to publish as arguments. 
+Lastly, publishing takes the topic to publish to, and the message to publish as arguments. 
 
-> Definition: `Messaging.publish(channel, message)`   
+> Definition: `Messaging.publish(topic, message)`   
 > Returns: Nothing.
 
 #### Examples
-Subscribe to channel and print incoming messages.
+Subscribe to topic and print incoming messages.
 
 ```python
 from clearblade.ClearBladeCore import System
@@ -338,7 +338,7 @@ mqtt = mySystem.Messaging(sanket)
 
 # Set up callback functions
 def on_connect(client, userdata, flags, rc):
-    # When we connect to the broker, subscribe to the southernplayalisticadillacmuzik channel
+    # When we connect to the broker, subscribe to the southernplayalisticadillacmuzik topic
     client.subscribe("southernplayalisticadillacmuzik")
     
 def on_message(client, userdata, message):
@@ -354,7 +354,7 @@ mqtt.connect()
 while(True):
     time.sleep(1)  # wait for messages
 ```
-Publish messages to a channel.
+Publish messages to a topic.
 
 ```python
 from clearblade.ClearBladeCore import System
@@ -375,7 +375,7 @@ mqtt = mySystem.Messaging(adam)
 
 # Set up callback function
 def on_connect(client, userdata, flags, rc):
-    # When we connect to the broker, start publishing our data to the keelhauled channel
+    # When we connect to the broker, start publishing our data to the keelhauled topic
     for i in range(20):
         if i%2==0:
             payload = "yo"
