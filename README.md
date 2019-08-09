@@ -372,25 +372,18 @@ adam = mySystem.User("adam@clearblade.com", "a13st0rm")
 # Use Adam to access a messaging client
 mqtt = mySystem.Messaging(adam)
 
-
-# Set up callback function
-def on_connect(client, userdata, flags, rc):
-    # When we connect to the broker, start publishing our data to the keelhauled topic
-    for i in range(20):
-        if i%2==0:
-            payload = "yo"
-        else:
-            payload = "ho"
-        client.publish("keelhauled", payload)
-        time.sleep(1)
-
-
-# Connect callback to client
-mqtt.on_connect = on_connect
-
-# Connect and spin for 30 seconds before disconnecting
+# Connect 
 mqtt.connect()
-time.sleep(30)
+
+# When we connect to the broker, start publishing our data to the keelhauled topic
+for i in range(20):
+    if i%2==0:
+        payload = "yo"
+    else:
+        payload = "ho"
+    client.publish("keelhauled", payload)
+    time.sleep(1)
+
 mqtt.disconnect()
 ```
 ---
