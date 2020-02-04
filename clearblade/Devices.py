@@ -24,7 +24,7 @@ def getDevice(system, authenticatedUser, name):
 
 
 class Device:
-    def __init__(self, system, name, key="", user=None):
+    def __init__(self, system, name, key="", authToken=""):
         self.name = name
         self.systemKey = system.systemKey
         self.url = system.url + "/api/v/2/devices/" + self.systemKey
@@ -36,8 +36,13 @@ class Device:
         self.system = system
         if key != "":
             self.authorize(key)
+        elif authToken != "":
+            cbLogs.info("Setting auth token...")
+            self.token = authToken
+            self.headers["ClearBlade-DeviceToken"] = self.token
+            cbLogs.info("Successfully set!")
         else:
-            cbLogs.error("You must provide an active key when creating the device", name)
+            cbLogs.error("You must provide an active key or auth token when creating the device", name)
             exit(-1)
 
     def authorize(self, key):
