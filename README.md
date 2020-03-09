@@ -193,7 +193,7 @@ email = "rob@clearblade.com"
 token = "yIaddmF42rzKsswf1T7NFNCh9ayg2QQECHRRnbmQfPSdfdaTnw4oWQXmRtv6YoO6oFyfgqq"
 
 # Auth as Service User
-anon = mySystem.ServiceUser(email, token)
+service_user = mySystem.ServiceUser(email, token)
 ```
 ---
 ### Devices
