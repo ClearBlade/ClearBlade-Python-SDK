@@ -77,3 +77,22 @@ class User(AnonUser):
             "email": email,
             "password": password
         }
+
+class ServiceUser(AnonUser):
+    def __init__(self, system, email, token):
+        super(ServiceUser, self).__init__(system)
+        self.credentials = {
+            "email": email,
+            "token": token
+        }
+    
+    def serviceAuthCheck(self):
+        self.headers.pop("ClearBlade-UserToken", None)
+        self.token = self.credentials["token"]
+        self.headers["ClearBlade-UserToken"] = self.token
+        if not AnonUser.checkAuth(self):
+            cbLogs.error("Service Auth check failed for", self.credentials["email"])
+            return
+        if self not in self.system.users:
+            self.system.users.append(self)
+        cbLogs.info("Successfully authenticated!")

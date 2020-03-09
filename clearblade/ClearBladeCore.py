@@ -51,6 +51,11 @@ class System:
         self.users.append(n00b)
         return n00b
 
+    def ServiceUser(self, email, token):
+        user = Users.ServiceUser(self, email, token)
+        user.serviceAuthCheck()
+        return user
+        
     ###############
     #   DEVICES   #
     ###############

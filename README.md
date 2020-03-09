@@ -129,6 +129,9 @@ In this case, no email or password is needed.
 > Definition: `System.AnonUser()`  
 > Returns: Anonymous User object.
 
+> Definition: `System.ServiceUser()`  
+> Returns: Service User object.
+
 If you allow users to register new user accounts, we have a method for that too. 
 You need to first authenticate as a user that has the permissions to do so using one of the functions defined above. 
 Then you can register a new user with their email and password. 
@@ -172,6 +175,25 @@ anon = mySystem.AnonUser()
 
 # Use the anon user to register Martin
 martin = mySystem.registerUser(anon, "martin@clearblade.com", "aQu3m1n1")
+```
+
+Using a service user.
+
+```python
+from clearblade.ClearBladeCore import System
+
+# System credentials
+SystemKey = "9abbd2970baabf8a6d2a9abcc47"
+SystemSecret = "9ABBD2970BA6ABFE6E8AEB8B14F"
+
+mySystem = System(SystemKey, SystemSecret)
+
+# Service User
+email = "rob@clearblade.com"
+token = "yIaddmF42rzKsswf1T7NFNCh9ayg2QQECHRRnbmQfPSdfdaTnw4oWQXmRtv6YoO6oFyfgqq"
+
+# Auth as Service User
+anon = mySystem.ServiceUser(email, token)
 ```
 ---
 ### Devices
