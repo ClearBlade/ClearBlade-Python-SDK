@@ -77,3 +77,19 @@ class User(AnonUser):
             "email": email,
             "password": password
         }
+
+class ServiceUser(AnonUser):
+    def __init__(self, system, email, token):
+        super(ServiceUser, self).__init__(system)
+        self.credentials = {
+            "email": email
+        }
+        self.token = token
+        self.headers.pop("ClearBlade-UserToken", None)
+        self.headers["ClearBlade-UserToken"] = self.token
+    
+    def authenticate(self):
+        cbLogs.warn("Method 'authenticate' is not applicable for service users")
+
+    def logout(self):
+        cbLogs.warn("Method 'logout' is not applicable for service users")

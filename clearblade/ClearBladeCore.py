@@ -51,6 +51,14 @@ class System:
         self.users.append(n00b)
         return n00b
 
+    def ServiceUser(self, email, token):
+        user = Users.ServiceUser(self, email, token)
+        if user.checkAuth():
+            return user
+        else:
+            cbLogs.error("Service User ", email, "failed to Auth")
+            exit(-1)
+
     ###############
     #   DEVICES   #
     ###############
