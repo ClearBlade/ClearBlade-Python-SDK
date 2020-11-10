@@ -133,6 +133,6 @@ class Messaging:
         cbLogs.info("Unsubscribing from:", channel)
         self.__mqttc.unsubscribe(channel)
 
-    def publish(self, channel, message, qos=0):
+    def publish(self, channel, message, qos=0, retain=False):
         cbLogs.info("Publishing", message, "to", channel, ".")
-        self.__mqttc.publish(channel, message, qos)
+        self.__mqttc.publish(channel, message, qos, retain)
