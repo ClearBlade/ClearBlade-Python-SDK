@@ -54,12 +54,11 @@ class AnonUser(object):
         cbLogs.info("Successfully authenticated!")
 
     def logout(self):
-        restcall.post(self.url + "/logout", headers=self.headers, sslVerify=self.system.sslVerify)
         if self in self.system.users:
             self.system.users.remove(self)
-        try:
-            cbLogs.info(self.credentials["email"], "has been logged out.")
-        except AttributeError:
+        # Only logging out Anonymous Users
+        if "email" not in self.credentials:
+            restcall.post(self.url + "/logout", headers=self.headers, sslVerify=self.system.sslVerify)
             cbLogs.info("Anonymous user has been logged out.")
 
     def checkAuth(self):
@@ -71,12 +70,16 @@ class AnonUser(object):
 
 
 class User(AnonUser):
-    def __init__(self, system, email, password):
+    def __init__(self, system, email, password="", authToken=""):
         super(User, self).__init__(system)
         self.credentials = {
             "email": email,
             "password": password
         }
+        self.token = authToken
+        self.headers.pop("ClearBlade-UserToken", None)
+        self.headers["ClearBlade-UserToken"] = self.token
+
 
 class ServiceUser(AnonUser):
     def __init__(self, system, email, token):
@@ -87,7 +90,7 @@ class ServiceUser(AnonUser):
         self.token = token
         self.headers.pop("ClearBlade-UserToken", None)
         self.headers["ClearBlade-UserToken"] = self.token
-    
+
     def authenticate(self):
         cbLogs.warn("Method 'authenticate' is not applicable for service users")
 

@@ -36,10 +36,16 @@ class System:
     #   USERS   #
     #############
 
-    def User(self, email, password):
-        user = Users.User(self, email, password)
-        user.authenticate()
-        return user
+    def User(self, email, password="", authToken=""):
+        user = Users.User(self, email, password=password, authToken=authToken)
+        if authToken == "":
+            user.authenticate()
+            return user
+        elif user.checkAuth():
+            return user
+        else:
+            cbLogs.error("Invalid User authToken")
+            exit(-1)
 
     def AnonUser(self):
         anon = Users.AnonUser(self)
