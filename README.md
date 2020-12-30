@@ -119,15 +119,25 @@ mySystem = System(SystemKey, SystemSecret, url, safe=False)
 ---
 ### Users
 Within your System, you may have **User** accounts that can perform actions. 
-Users can be authenticated with their email and password. 
-You may also allow for people to authenticate to your system anonymously. 
-In this case, no email or password is needed. 
+
+Users can be authenticated in two ways:
+1. With their credentials, i.e. email and password. 
+2. Without credentials, i.e. anonymously.
 
 > Definition: `System.User(email, password)`  
 > Returns: Regular User object.
 
 > Definition: `System.AnonUser()`  
 > Returns: Anonymous User object.
+
+
+Previously authenticated Users can also connected to your System without being re-authenticated as long as they provide a valid authToken:
+
+> Definition: `System.User(email, authToken="<valid authToken>")`
+> Returns: Regular User object.
+
+
+Service Users (Users that were created with authTokens that are indefinitely valid) can connect to your System as follows:
 
 > Definition: `System.ServiceUser()`  
 > Returns: Service User object.
@@ -203,6 +213,13 @@ To authenticate a device, you need its _active key_.
 
 > Definition: `System.Device(name, key)`  
 > Returns: Device object.
+
+
+Previously authenticated Devices can also connected to your System without being re-authenticated as long as they provide a valid authToken:
+
+> Definition: `System.Device(name, authToken="<valid authToken>")`
+> Returns: Device object.
+
 
 Want to get a list of all the devices an authenticated entity (user, device, or developer) can view?
 Simple. 
