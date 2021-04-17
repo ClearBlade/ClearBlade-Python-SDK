@@ -397,7 +397,7 @@ Publish messages to a topic.
 
 ```python
 from clearblade.ClearBladeCore import System
-import random
+import random, time
 
 # System credentials
 SystemKey = "9abbd2970baabf8aa6d2a9abcc47"
@@ -420,7 +420,7 @@ for i in range(20):
         payload = "yo"
     else:
         payload = "ho"
-    client.publish("keelhauled", payload)
+    mqtt.publish("keelhauled", payload)
     time.sleep(1)
 
 mqtt.disconnect()
