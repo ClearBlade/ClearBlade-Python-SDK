@@ -134,5 +134,13 @@ class Messaging:
         self.__mqttc.unsubscribe(channel)
 
     def publish(self, channel, message, qos=0, retain=False):
-        cbLogs.info("Publishing", message, "to", channel, ".")
+        msgType = type(message).__name__
+        try:
+            if msgType == "str":
+                logMsg = message
+            else:
+                logMsg = str(message)
+        except:
+            logMsg = "unstringifiable object"
+        cbLogs.info("Publishing", logMsg, "to", channel, ".")
         self.__mqttc.publish(channel, message, qos, retain)
