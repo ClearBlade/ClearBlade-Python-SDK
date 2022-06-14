@@ -351,7 +351,7 @@ You can subscribe to as many topics as you like, and subsequently unsubscribe fr
 > Definition: `Messaging.unsubscribe(topic)`   
 > Returns: Nothing.
 
-Lastly, publishing takes the topic to publish to, and the message to publish as arguments. 
+Lastly, publishing takes the topic to publish to, and the message to publish as arguments. The type of message can be string or bytes.
 
 > Definition: `Messaging.publish(topic, message)`   
 > Returns: Nothing.
