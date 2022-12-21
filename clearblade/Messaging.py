@@ -143,4 +143,5 @@ class Messaging:
         except:
             logMsg = "unstringifiable object"
         cbLogs.info("Publishing", logMsg, "to", channel, ".")
-        self.__mqttc.publish(channel, message, qos, retain)
+        resp = self.__mqttc.publish(channel, message, qos, retain)
+        return resp
