@@ -354,7 +354,17 @@ You can subscribe to as many topics as you like, and subsequently unsubscribe fr
 Lastly, publishing takes the topic to publish to, and the message to publish as arguments. The type of message can be string or bytes.
 
 > Definition: `Messaging.publish(topic, message)`   
-> Returns: Nothing.
+> Returns: Returns a MQTTMessageInfo which expose the following attributes and methods:
+
+1. **rc**, the result of the publishing. It could be MQTT_ERR_SUCCESS to indicate success, MQTT_ERR_NO_CONN if the client is not currently connected, or    MQTT_ERR_QUEUE_SIZE when max_queued_messages_set is used to indicate that message is neither queued nor sent.
+
+2. **mid** is the message ID for the publish request. The mid value can be used to track the publish request by checking against the mid argument in the    on_publish() callback if it is defined. wait_for_publish may be easier depending on your use-case.
+
+3. **wait_for_publish()** will block until the message is published. It will raise ValueError if the message is not queued (rc == MQTT_ERR_QUEUE_SIZE),    or a RuntimeError if there was an error when publishing, most likely due to the client not being connected.
+
+4. **is_published()** returns True if the message has been published. It will raise ValueError if the message is not queued (rc == MQTT_ERR_QUEUE_SIZE),    or a RuntimeError if there was an error when publishing, most likely due to the client not being connected.
+
+A ValueError will be raised if topic is None, has zero length or is invalid (contains a wildcard), if qos is not one of 0, 1 or 2, or if the length of the payload is greater than 268435455 bytes.
 
 #### Examples
 Subscribe to topic and print incoming messages.
