@@ -1,5 +1,6 @@
 from __future__ import print_function, absolute_import
 import json
+import ssl
 import requests
 from requests.exceptions import *
 from . import cbLogs
@@ -46,19 +47,35 @@ def get(url, headers={}, params={}, silent=False, sslVerify=True):
     return resp
 
 
-def post(url, headers={}, data={}, silent=False, sslVerify=True):
+def post(url, headers={}, data={}, silent=False, sslVerify=True, x509keyPair=None):
     # make sure our data is valid json
     try:
         json.loads(data)
     except TypeError:
         data = json.dumps(data)
 
-    # try our request
-    try:
-        resp = requests.post(url, headers=headers, data=data, verify=sslVerify)
-    except ConnectionError:
-        cbLogs.error("Connection error. Check that", url, "is up and accepting requests.")
-        exit(-1)
+    if x509keyPair == None:
+        # try our request
+        try:
+            resp = requests.post(url, headers=headers, data=data, verify=sslVerify)
+        except ConnectionError:
+            cbLogs.error("Connection error. Check that", url, "is up and accepting requests.")
+            exit(-1)
+    else:
+        # MTLS auth, so create a new SSL context
+        try:
+            context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+            # Load the cert and key
+            context.load_cert_chain(certfile=x509keyPair["certfile"], keyfile=x509keyPair["keyfile"])
+            adapter = requests.adapters.HTTPAdapter(pool_connections=1, pool_maxsize=1, pool_block=True)
+            adapter.poolmanager.connection_pool_kw['ssl_context'] = context
+            s = requests.session()
+            s.mount('https://', adapter)
+            resp = s.post(url, headers=headers, data=data, verify=sslVerify)
+        except ConnectionError:
+            cbLogs.error("Connection error. Check that", url, "is up and accepting requests.")
+            exit(-1)
+
 
     # check for errors
     if resp.status_code == 200:
