@@ -77,8 +77,8 @@ class System:
         dev = Devices.getDevice(self, authenticatedUser, name)
         return dev
 
-    def Device(self, name, key="", authToken=""):
-        dev = Devices.Device(system=self, name=name, key=key, authToken=authToken)
+    def Device(self, name, key="", authToken="", x509keyPair=None):
+        dev = Devices.Device(system=self, name=name, key=key, authToken=authToken, x509keyPair=x509keyPair)
         # check if dev in self.devices?
         return dev
 
