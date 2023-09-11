@@ -62,16 +62,9 @@ def post(url, headers={}, data={}, silent=False, sslVerify=True, x509keyPair=Non
             cbLogs.error("Connection error. Check that", url, "is up and accepting requests.")
             exit(-1)
     else:
-        # MTLS auth, so create a new SSL context
         try:
-            context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-            # Load the cert and key
-            context.load_cert_chain(certfile=x509keyPair["certfile"], keyfile=x509keyPair["keyfile"])
-            adapter = requests.adapters.HTTPAdapter(pool_connections=1, pool_maxsize=1, pool_block=True)
-            adapter.poolmanager.connection_pool_kw['ssl_context'] = context
-            s = requests.session()
-            s.mount('https://', adapter)
-            resp = s.post(url, headers=headers, data=data, verify=sslVerify)
+            # mTLS auth so load cert
+            resp = requests.post(url, headers=headers, data=data, verify=sslVerify, cert=(x509keyPair["certfile"], x509keyPair["keyfile"]))
         except ConnectionError:
             cbLogs.error("Connection error. Check that", url, "is up and accepting requests.")
             exit(-1)
