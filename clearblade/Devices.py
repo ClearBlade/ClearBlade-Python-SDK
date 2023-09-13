@@ -24,10 +24,11 @@ def getDevice(system, authenticatedUser, name):
 
 
 class Device:
-    def __init__(self, system, name, key="", authToken=""):
+    def __init__(self, system, name, key="", authToken="", x509keyPair=None):
         self.name = name
         self.systemKey = system.systemKey
         self.url = system.url + "/api/v/2/devices/" + self.systemKey
+        self.mtls_auth_url = system.url + ":444/api/v/4/devices/mtls/auth"
         self.headers = {
             "Content-Type": "application/json",
             "Accept": "application/json"
@@ -41,8 +42,10 @@ class Device:
             self.token = authToken
             self.headers["ClearBlade-DeviceToken"] = self.token
             cbLogs.info("Successfully set!")
+        elif x509keyPair != None:
+            self.authorize_x509(x509keyPair)
         else:
-            cbLogs.error("You must provide an active key or auth token when creating the device", name)
+            cbLogs.error("You must provide an active key, auth token or x509 key pair when creating or accessing the device", name)
             exit(-1)
 
     def authorize(self, key):
@@ -52,6 +55,17 @@ class Device:
             "activeKey": key
         }
         resp = restcall.post(self.url + "/auth", headers=self.headers, data=credentials, sslVerify=self.system.sslVerify)
+        self.token = str(resp["deviceToken"])
+        self.headers["ClearBlade-DeviceToken"] = self.token
+        cbLogs.info("Successfully authenticated!")
+
+    def authorize_x509(self, x509keyPair):
+        cbLogs.info("Authenticating", self.name, "as a device using x509 key pair...")
+        credentials = {
+            "system_key": self.systemKey,
+            "name": self.name
+        }
+        resp = restcall.post(self.mtls_auth_url, headers=self.headers, data=credentials, sslVerify=self.system.sslVerify, x509keyPair=x509keyPair)
         self.token = str(resp["deviceToken"])
         self.headers["ClearBlade-DeviceToken"] = self.token
         cbLogs.info("Successfully authenticated!")

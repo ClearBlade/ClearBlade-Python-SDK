@@ -208,11 +208,20 @@ service_user = mySystem.ServiceUser(email, token)
 ---
 ### Devices
 Another common entity that may interact with your system is a **device**. 
-Similar to users, devices must be authenticated before you can use them. 
-To authenticate a device, you need its _active key_. 
+Similar to users, devices must be authenticated before you can use them.
+
+One way to authenticate a device is using its _active key_. 
 
 > Definition: `System.Device(name, key)`  
 > Returns: Device object.
+
+
+Another way to authenticate a device is using mTLS authentication which requires passing an _x509keyPair_ when creating the Device object. 
+
+> Definition: `System.Device(name, x509keyPair={"certfile": "/path/to/your/cert.pem", "keyfile": "/path/to/your.key"})`
+> Returns: Device object.
+
+mTLS authentication is achieved by a POST request being sent to API `{platformURL}:444/api/v/4/devices/mtls/auth` with the provided x509keyPair being loaded into the SSL context's cert chain. This is handled by the SDK.
 
 
 Previously authenticated devices can also connected to your system without being re-authenticated as long as they provide a valid authToken:
