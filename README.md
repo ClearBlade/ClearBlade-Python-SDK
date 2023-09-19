@@ -216,12 +216,12 @@ One way to authenticate a device is using its _active key_.
 > Returns: Device object.
 
 
-Another way to authenticate a device is using mTLS authentication which requires passing an _x509keyPair_ when creating the Device object. 
+Another way to authenticate a device is using mTLS authentication, which requires passing an _x509keyPair_ when creating the device object. 
 
 > Definition: `System.Device(name, x509keyPair={"certfile": "/path/to/your/cert.pem", "keyfile": "/path/to/your.key"})`
 > Returns: Device object.
 
-mTLS authentication is achieved by a POST request being sent to API `{platformURL}:444/api/v/4/devices/mtls/auth` with the provided x509keyPair being loaded into the SSL context's cert chain. This is handled by the SDK.
+mTLS authentication is achieved by a POST request being sent to API `{platformURL}:444/api/v/4/devices/mtls/auth` with the provided x509keyPair being loaded into the SSL context's cert chain. The SDK handles this.
 
 
 Previously authenticated devices can also connected to your system without being re-authenticated as long as they provide a valid authToken:
