@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 import json
 from . import restcall
-from . import cbLogs
+from . import cbLogs, cbErrors
 
 
 class Collection():
@@ -16,7 +16,7 @@ class Collection():
             self.collectionID = None
         else:
             cbLogs.error("You must supply either a collection name or id.")  # beep
-            exit(-1)
+            cbErrors.handle(-1)
         self.headers = authenticatedUser.headers
         self.currentPage = 0
         self.nextPageURL = None
@@ -100,7 +100,7 @@ def DEVnewCollection(developer, system, name):
 def DEVaddColumnToCollection(developer, system, collection, columnName, columnType):
     if not collection.collectionID:
         cbLogs.error("You must supply the collection id when adding a column to a collection.")
-        exit(-1)
+        cbErrors.handle(-1)
     url = system.url + "/admin/collectionmanagement"
     data = {
         "id": collection.collectionID,

@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 from . import restcall
-from . import cbLogs
+from . import cbLogs, cbErrors
 from . import Collections
 from . import Devices
 from . import Permissions
@@ -29,7 +29,7 @@ def registerDev(fname, lname, org, email, password, url="https://platform.clearb
         return newDev
     except TypeError:
         cbLogs.error(email, "already exists as a developer at", url)
-        exit(-1)
+        cbErrors.handle(-1)
 
 
 class Developer:

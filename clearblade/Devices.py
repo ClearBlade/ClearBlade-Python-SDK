@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 import json
-from . import cbLogs
+from . import cbLogs, cbErrors
 from . import restcall
 
 
@@ -46,7 +46,7 @@ class Device:
             self.authorize_x509(x509keyPair)
         else:
             cbLogs.error("You must provide an active key, auth token or x509 key pair when creating or accessing the device", name)
-            exit(-1)
+            cbErrors.handle(-1)
 
     def authorize(self, key):
         cbLogs.info("Authenticating", self.name, "as a device...")

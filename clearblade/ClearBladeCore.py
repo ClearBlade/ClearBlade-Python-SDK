@@ -6,7 +6,7 @@ from . import Collections
 from . import Messaging
 from . import Code
 from .Developers import *  # allows you to import Developer from ClearBladeCore
-from . import cbLogs
+from . import cbLogs, cbErrors
 
 
 class System:
@@ -45,7 +45,7 @@ class System:
             return user
         else:
             cbLogs.error("Invalid User authToken")
-            exit(-1)
+            cbErrors.handle(-1)
 
     def AnonUser(self):
         anon = Users.AnonUser(self)
@@ -63,7 +63,7 @@ class System:
             return user
         else:
             cbLogs.error("Service User ", email, "failed to Auth")
-            exit(-1)
+            cbErrors.handle(-1)
 
     ###############
     #   DEVICES   #
@@ -89,7 +89,7 @@ class System:
     def Collection(self, authenticatedUser, collectionID="", collectionName=""):
         if not collectionID and not collectionName:
             cbLogs.error("beep")
-            exit(-1)
+            cbErrors.handle(-1)
         col = Collections.Collection(self, authenticatedUser, collectionID, collectionName)
         self.collections.append(col)
         return col
