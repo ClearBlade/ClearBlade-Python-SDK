@@ -113,7 +113,31 @@ class Messaging:
         if self.on_log:
             self.on_log(client, userdata, level, buf)
 
-    def connect(self):
+    def set_will(self, topic, payload, qos = 0, retain = False):
+        """
+        Set a Will to be sent by the broker in case the client disconnects unexpectedly.
+        This must be called before connect() to have any effect.
+
+        :param str topic: The topic that the will message should be published on.
+        :param payload: The message to send as a will. If not given, or set to None a
+            zero length message will be used as the will. Passing an int or float
+            will result in the payload being converted to a string representing
+            that number. If you wish to send a true int/float, use struct.pack() to
+            create the payload you require.
+        :param int qos: The quality of service level to use for the will.
+        :param bool retain: If set to true, the will message will be set as the retained message for the topic.
+        """
+
+        self.__mqttc.will_set(topic, payload, qos, retain)
+
+    def clear_will(self):
+        """
+        Removes a will that was previously configured with `set_will()`.
+        Must be called before connect() to have any effect.
+        """
+        self.__mqttc.will_clear()
+
+    def connect(self, will_topic=None, will_payload=1883):
         cbLogs.info("Connecting to MQTT.")
         if self.__use_tls:
             self.__mqttc.tls_set()
