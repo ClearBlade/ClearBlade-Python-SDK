@@ -8,7 +8,7 @@ setup(
     version=[version],
     description='A Python SDK for interacting with the ClearBlade Platform.',
     url='https://github.com/ClearBlade/ClearBlade-Python-SDK',
-    download_url='https://github.com/ClearBlade/ClearBlade-Python-SDK/archive/' + version + '.tar.gz',
+    download_url='https://github.com/ClearBlade/ClearBlade-Python-SDK/archive/v' + version + '.tar.gz',
     keywords=['clearblade', 'iot', 'sdk'],
     maintainer='Aaron Allsbrook',
     maintainer_email='dev@clearblade.com'
