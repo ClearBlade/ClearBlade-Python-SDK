@@ -331,7 +331,7 @@ If you don't specify a client_id, the SDK will use a random hex string.
 > Definition: `System.Messaging(user, port=1883, keepalive=30, url="", client_id="")`   
 > Returns: MQTT messaging object.
 
-There are a slew of callback functions you may assign. 
+There are a number of callback functions you may assign. 
 Typically, you want to set these callbacks before you connect to the broker. 
 This is a list of the function names and their expected parameters. 
 For more information about the individual callbacks, see the [paho-mqtt](https://github.com/eclipse/paho.mqtt.python#callbacks) documentation.   
@@ -343,6 +343,7 @@ For more information about the individual callbacks, see the [paho-mqtt](https:/
 - `on_message(client, userdata, mid)`   
 - `on_log(client, userdata, level, buf)`   
 
+#### Connecting and Disconnecting
 Before publishing or subscribing, you must connect your client to the broker. 
 After you're finished, it's good practice to disconnect from the broker before quitting your program. 
 These are both simple functions that take no parameters.
@@ -352,6 +353,23 @@ These are both simple functions that take no parameters.
 > Definition: `Messaging.disconnect()`   
 > Returns: Nothing.   
 
+#### Last Will and Testament (LWT)
+MWTT brokers support the concept of a last will and testament. The last will and testament is a set of parameters that allow the MQTT broker 
+publish a specified message to a specific topic in the event of an abnormal disconnection. Setting the last will and testament can be accomplished
+by invoking the `set_will` function. The last will and testament can also be removed from a MQTT client by invoking `clear_will`.
+
+**Note: set_will() and clear_will() must be invoked prior to invoking Messaging.connect()**
+
+- `set_will(topic, payload, qos, retain)`   
+- `clear_will()`   
+
+> Definition: `Messaging.set_will()`   
+> Returns: Nothing.   
+> Definition: `Messaging.clear_will()`   
+> Returns: Nothing. 
+
+
+#### Subscribing to topics
 You can subscribe to as many topics as you like and unsubscribe from them using the following two commands. 
 
 > Definition: `Messaging.subscribe(topic)`   
@@ -359,6 +377,7 @@ You can subscribe to as many topics as you like and unsubscribe from them using 
 > Definition: `Messaging.unsubscribe(topic)`   
 > Returns: Nothing.
 
+#### Publishing to topics
 Publishing takes the topic to publish to and the message to publish as arguments. The type of message can be string or bytes.
 
 > Definition: `Messaging.publish(topic, message)`   
