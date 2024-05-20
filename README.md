@@ -5,6 +5,8 @@ A Python SDK for interacting with the ClearBlade Platform.
 
 Python 2 and 3 are supported, but all examples written here are in Python 2.
 
+**Note: This SDK is for use with ClearBlade IoT Enterprise and NOT ClearBlade IoT Core. The Python SDK for ClearBlade IoT Core can be found here: https://github.com/ClearBlade/python-iot.**
+
 ## Installation
 
 ### To install:
