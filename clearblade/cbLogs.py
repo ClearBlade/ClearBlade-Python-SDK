@@ -6,7 +6,7 @@ import logging
 
 DEBUG = True
 MQTT_DEBUG = True
-USE_LOGS = False  # default to false to preserve existing behavior
+USE_LOGGING = False  # default to false to preserve existing behavior
 LEVEL_TO_LOG_LEVEL = {
     1: logging.INFO,
     2: logging.INFO,   # NOTE: no equivelent to "notice"
@@ -35,7 +35,7 @@ class prettyText:
 
 def error(*args):
     # Errors should always be shown
-    if USE_LOGS:
+    if USE_LOGGING:
         cb_logger.error(" ".join(args))
     else:
         print(prettyText.bold + prettyText.red + "CB Error:" + prettyText.endColor, " ".join(args))
@@ -43,7 +43,7 @@ def error(*args):
 
 def warn(*args):
     # Warnings should always be shown
-    if USE_LOGS:
+    if USE_LOGGING:
         cb_logger.warning(" ".join(args))
     else:
         print(prettyText.bold + prettyText.yellow + "CB Warning: " + prettyText.endColor, " ".join(args))
@@ -51,7 +51,7 @@ def warn(*args):
 
 def info(*args):
     if DEBUG:  # extra info should not always be shown
-        if USE_LOGS:
+        if USE_LOGGING:
             cb_logger.debug(" ".join(args))
         else:
             print(prettyText.bold + prettyText.blue + "CB Info:" + prettyText.endColor, " ".join(args))
@@ -59,7 +59,7 @@ def info(*args):
 
 def mqtt(level, data):
     if MQTT_DEBUG:
-        if USE_LOGS:
+        if USE_LOGGING:
             mqtt_logger = logging.getLogger("Mqtt")
             mqtt_logger.log(LEVEL_TO_LOG_LEVEL.get(level, logging.INFO), data)
         else:
