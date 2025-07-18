@@ -140,7 +140,13 @@ class Messaging:
     def connect(self, will_topic=None, will_payload=1883):
         cbLogs.info("Connecting to MQTT.")
         if self.__use_tls:
-            self.__mqttc.tls_set()
+            try:
+                self.__mqttc.tls_set()
+            except ValueError as e:
+                if str(e) == "SSL/TLS has already been configured.":
+                    pass
+                else:
+                    raise e
         self.__mqttc.connect(self.__url, self.__port, self.__keepalive)
         self.__mqttc.loop_start()
 
