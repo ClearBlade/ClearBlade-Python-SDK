@@ -3,7 +3,7 @@ import json
 import ssl
 import requests
 from requests.exceptions import *
-from . import cbLogs
+from . import cbLogs, cbErrors
 from .cbLogs import prettyText
 
 
@@ -31,7 +31,7 @@ def get(url, headers={}, params={}, silent=False, sslVerify=True):
         resp = requests.get(url, headers=headers, params=params, verify=sslVerify)
     except ConnectionError:
         cbLogs.error("Connection error. Check that", url, "is up and accepting requests.")
-        exit(-1)
+        cbErrors.handle(-1)
 
     # check for errors
     if resp.status_code == 200:
@@ -41,7 +41,7 @@ def get(url, headers={}, params={}, silent=False, sslVerify=True):
             resp = resp.text
     elif not silent:  # some requests are meant to fail
         panicmessage(resp, "GET", url, headers, params=params)
-        exit(-1)
+        cbErrors.handle(-1)
 
     # return successful response
     return resp
@@ -60,14 +60,14 @@ def post(url, headers={}, data={}, silent=False, sslVerify=True, x509keyPair=Non
             resp = requests.post(url, headers=headers, data=data, verify=sslVerify)
         except ConnectionError:
             cbLogs.error("Connection error. Check that", url, "is up and accepting requests.")
-            exit(-1)
+            cbErrors.handle(-1)
     else:
         try:
             # mTLS auth so load cert
             resp = requests.post(url, headers=headers, data=data, verify=sslVerify, cert=(x509keyPair["certfile"], x509keyPair["keyfile"]))
         except ConnectionError:
             cbLogs.error("Connection error. Check that", url, "is up and accepting requests.")
-            exit(-1)
+            cbErrors.handle(-1)
 
 
     # check for errors
@@ -78,7 +78,7 @@ def post(url, headers={}, data={}, silent=False, sslVerify=True, x509keyPair=Non
             resp = resp.text
     elif not silent:  # some requests are meant to fail
         panicmessage(resp, "POST", url, headers, data=data)
-        exit(-1)
+        cbErrors.handle(-1)
 
     # return successful response
     return resp
@@ -96,7 +96,7 @@ def put(url, headers={}, data={}, silent=False, sslVerify=True):
         resp = requests.put(url, headers=headers, data=data, verify=sslVerify)
     except ConnectionError:
         cbLogs.error("Connection error. Check that", url, "is up and accepting requests.")
-        exit(-1)
+        cbErrors.handle(-1)
 
     # check for errors
     if resp.status_code == 200:
@@ -106,7 +106,7 @@ def put(url, headers={}, data={}, silent=False, sslVerify=True):
             resp = resp.text
     elif not silent:  # some requests are meant to fail
         panicmessage(resp, "PUT", url, headers, data=data)
-        exit(-1)
+        cbErrors.handle(-1)
 
     # return successful response
     return resp
@@ -118,7 +118,7 @@ def delete(url, headers={}, params={}, silent=False, sslVerify=True):
         resp = requests.delete(url, headers=headers, params=params, verify=sslVerify)
     except ConnectionError:
         cbLogs.error("Connection error. Check that", url, "is up and accepting requests.")
-        exit(-1)
+        cbErrors.handle(-1)
 
     # check for errors
     if resp.status_code == 200:
@@ -128,7 +128,7 @@ def delete(url, headers={}, params={}, silent=False, sslVerify=True):
             resp = resp.text
     elif not silent:  # some requests are meant to fail
         panicmessage(resp, "DELETE", url, headers, params=params)
-        exit(-1)
+        cbErrors.handle(-1)
 
     # return successful response
     return resp

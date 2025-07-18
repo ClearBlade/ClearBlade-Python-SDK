@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 import paho.mqtt.client as mqtt
 import uuid
-from . import cbLogs
+from . import cbLogs, cbErrors
 
 
 # This function strips the scheme and the port (if they exist) off the given url
@@ -18,7 +18,7 @@ def parse_url(url):
             return s[0]
     elif len(s) > 3:
         cbLogs.error("Couldn't parse this url:", url)
-        exit(-1)
+        cbErrors.handle(-1)
     else:
         return s[0]
 
@@ -65,22 +65,22 @@ class Messaging:
             cbLogs.info("Connected to MQTT broker at", self.__url, "port", str(self.__port) + ".")
         elif rc == 1:
             cbLogs.error("MQTT connection to", self.__url, "port", str(self.__port) + ".", "refused. Incorrect protocol version.")  # I should probably fix this
-            exit(-1)
+            cbErrors.handle(-1)
         elif rc == 2:
             cbLogs.error("MQTT connection to", self.__url, "port", str(self.__port) + ".", "refused. Invalid client identifier.")
-            exit(-1)
+            cbErrors.handle(-1)
         elif rc == 3:
             cbLogs.error("MQTT connection to", self.__url, "port", str(self.__port) + ".", "refused. Server unavailable.")
-            exit(-1)
+            cbErrors.handle(-1)
         elif rc == 4:
             cbLogs.error("MQTT connection to", self.__url, "port", str(self.__port) + ".", "refused. Bad username or password.")
-            exit(-1)
+            cbErrors.handle(-1)
         elif rc == 5:
             cbLogs.error("MQTT connection to", self.__url, "port", str(self.__port) + ".", "refused. Not authorized.")
-            exit(-1)
+            cbErrors.handle(-1)
         else:
             cbLogs.error("MQTT connection to", self.__url, "port", str(self.__port) + ".", "refused. Tell ClearBlade to update their SDK for this case. rc=" + rc)
-            exit(-1)
+            cbErrors.handle(-1)
         if self.on_connect:
             self.on_connect(client, userdata, flags, rc)
 
