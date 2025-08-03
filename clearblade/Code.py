@@ -10,6 +10,7 @@ class Service():
         self.sslVerify = system.sslVerify
 
     def execute(self, authenticatedUser, params={}):
+        """Execute Code Service as Authenticated User"""
         cbLogs.info("Executing code service", self.name)
         resp = restcall.post(self.url, headers=authenticatedUser.headers, data=params, sslVerify=self.sslVerify)
         return resp

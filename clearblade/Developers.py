@@ -6,6 +6,7 @@ from . import Devices
 from . import Permissions
 
 def registerDev(fname, lname, org, email, password, url="https://platform.clearblade.com", registrationKey="", sslVerify=True):
+    """Register Developer in environment"""
     newDevCredentials = {
         "fname": fname,
         "lname": lname,
@@ -51,6 +52,7 @@ class Developer:
             self.authenticate()
 
     def authenticate(self):
+        """Authenticate Developer"""
         cbLogs.info("Authenticating", self.credentials["email"], "as a developer...")
         resp = restcall.post(self.url + "/admin/auth", headers=self.headers, data=self.credentials, sslVerify=self.sslVerify)
         self.token = str(resp["dev_token"])
@@ -58,6 +60,7 @@ class Developer:
         cbLogs.info("Successfully authenticated!")
 
     def logout(self):
+        """Logout Developer"""
         restcall.post(self.url + "/admin/logout", headers=self.headers, sslVerify=self.sslVerify)
         if self in self.system.users:
             self.system.users.remove(self)
@@ -74,12 +77,15 @@ class Developer:
     #################
 
     def getAllCollections(self, system):
+        """Return all Collections as Developer"""
         return Collections.DEVgetAllCollections(self, system)
 
     def newCollection(self, system, name):
+        """Create Collection as Developer"""
         return Collections.DEVnewCollection(self, system, name)
 
     def addColumnToCollection(self, system, collection, columnName, columnType):
+        """Add Column to Collection as Developer"""
         return Collections.DEVaddColumnToCollection(self, system, collection, columnName, columnType)
 
     ###############
@@ -87,18 +93,23 @@ class Developer:
     ###############
 
     def newDevice(self, system, name, enabled=True, type="", state="", active_key="", allow_certificate_auth=False, allow_key_auth=True, certificate="", description="", keys=""):
+        """Create Device as Developer"""
         return Devices.DEVnewDevice(self, system, name, enabled, type, state, active_key, allow_certificate_auth, allow_key_auth, certificate, description, keys)
 
     def getDevices(self, system, query=None):
+        """Return Devices as Developer"""
         return Devices.DEVgetDevices(self, system, query)
 
     def getDevice(self, system, name):
+        """Return Device as Developer"""
         return Devices.DEVgetDevice(self, system, name)
 
     def updateDevice(self, system, name, updates):
+        """Update Device as Developer"""
         return Devices.DEVupdateDevice(self, system, name, updates)
 
     def deleteDevice(self, system, name):
+        """Delete Device as Developer"""
         return Devices.DEVdeleteDevice(self, system, name)
 
     #################
@@ -106,5 +117,6 @@ class Developer:
     #################
 
     def setPermissionsForCollection(self, system, collection, permissionsLevel, roleName):
+        """Set Permissions for Collection as Developer"""
         return Permissions.DEVsetPermissionsForCollection(self, system, collection, permissionsLevel, roleName)
 

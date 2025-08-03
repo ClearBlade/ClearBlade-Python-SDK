@@ -40,6 +40,7 @@ class AnonUser(object):
         self.token = ""
 
     def authenticate(self):
+        """Authenticate User"""
         self.headers.pop("ClearBlade-UserToken", None)
         try:
             cbLogs.info("Authenticating", self.credentials["email"], "as a user...")
@@ -54,6 +55,7 @@ class AnonUser(object):
         cbLogs.info("Successfully authenticated!")
 
     def logout(self):
+        """Logout User"""
         if self in self.system.users:
             self.system.users.remove(self)
         # Only logging out Anonymous Users
@@ -62,6 +64,7 @@ class AnonUser(object):
             cbLogs.info("Anonymous user has been logged out.")
 
     def checkAuth(self):
+        """Check Authentication (i.e. validity of token)"""
         resp = restcall.post(self.url + "/checkauth", headers=self.headers, silent=True, sslVerify=self.system.sslVerify)
         try:
             return resp["is_authenticated"]
@@ -92,7 +95,9 @@ class ServiceUser(AnonUser):
         self.headers["ClearBlade-UserToken"] = self.token
 
     def authenticate(self):
+        """Checking Authentication Invalid for Service Account Users"""
         cbLogs.warn("Method 'authenticate' is not applicable for service users")
 
     def logout(self):
+        """Logging out Invalid for Service Account Users"""
         cbLogs.warn("Method 'logout' is not applicable for service users")

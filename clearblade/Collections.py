@@ -25,6 +25,7 @@ class Collection():
         self.sslVerify = system.sslVerify
 
     def getItems(self, query=None, pagesize=100, pagenum=1, url=""):
+        """Return Collection Items"""
         url = self.url + url
         params = {
             "PAGESIZE": pagesize,
@@ -47,12 +48,14 @@ class Collection():
         return self.items
 
     def getNextPage(self):
+        """Return Next Page"""
         if self.nextPageURL:
             return self.getItems(url=self.nextPageURL)
         else:
             cbLogs.info("No next page!")
 
     def getPrevPage(self):
+        """Return Previous Page"""
         if self.prevPageURL:
             return self.getItems(url=self.prevPageURL)
         elif self.currentPage == 2:
@@ -62,9 +65,11 @@ class Collection():
             cbLogs.info("No previous page!")
 
     def createItem(self, data):
+        """Create Collection Item"""
         return restcall.post(self.url, headers=self.headers, data=data, sslVerify=self.sslVerify)
 
     def updateItems(self, query, data):
+        """Update Collection Items"""
         payload = {
             "query": query.filters,
             "$set": data
@@ -72,6 +77,7 @@ class Collection():
         return restcall.put(self.url, headers=self.headers, data=payload, sslVerify=self.sslVerify)
 
     def deleteItems(self, query):
+        """Delete Collection Items"""
         return restcall.delete(self.url, headers=self.headers, params={"query": json.dumps(query.filters)}, sslVerify=self.sslVerify)
 
 
@@ -80,6 +86,7 @@ class Collection():
 ###########################
 
 def DEVgetAllCollections(developer, system):
+    """Return all Collections as Developer"""
     url = system.url + "/admin/allcollections"
     params = {
         "appid": system.systemKey
@@ -88,6 +95,7 @@ def DEVgetAllCollections(developer, system):
     return resp
 
 def DEVnewCollection(developer, system, name):
+    """Create Collection as Developer"""
     url = system.url + "/admin/collectionmanagement"
     data = {
         "appID": system.systemKey,
@@ -98,6 +106,7 @@ def DEVnewCollection(developer, system, name):
     return Collection(system, developer, collectionID=resp["collectionID"])
 
 def DEVaddColumnToCollection(developer, system, collection, columnName, columnType):
+    """Add Column to Collection as Developer"""
     if not collection.collectionID:
         cbLogs.error("You must supply the collection id when adding a column to a collection.")
         cbErrors.handle(-1)

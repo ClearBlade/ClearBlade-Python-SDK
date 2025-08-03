@@ -6,6 +6,7 @@ from . import cbLogs, cbErrors
 
 # This function strips the scheme and the port (if they exist) off the given url
 def parse_url(url):
+    """Parse URL"""
     s = url.split(":")
     if len(s) == 3:  # we've got http and a port. get rid of them
         return s[1][2:]
@@ -139,6 +140,7 @@ class Messaging:
         self.__mqttc.will_clear()
 
     def connect(self, will_topic=None, will_payload=1883):
+        """Connect to MQTT"""
         cbLogs.info("Connecting to MQTT.")
         if self.__use_tls:
             try:
@@ -152,19 +154,23 @@ class Messaging:
         self.__mqttc.loop_start()
 
     def disconnect(self):
+        """Disconnect from MQTT"""
         cbLogs.info("Disconnecting from MQTT.")
         self.__mqttc.loop_stop()
         self.__mqttc.disconnect()
 
     def subscribe(self, channel):
+        """Subscribe to MQTT Topic"""
         cbLogs.info("Subscribing to:", channel)
         self.__mqttc.subscribe(channel, self.__qos)
 
     def unsubscribe(self, channel):
+        """Unsubscribe from MQTT Topic"""
         cbLogs.info("Unsubscribing from:", channel)
         self.__mqttc.unsubscribe(channel)
 
     def publish(self, channel, message, qos=0, retain=False):
+        """Publish to MQTT Topic"""
         msgType = type(message).__name__
         try:
             if msgType == "str":

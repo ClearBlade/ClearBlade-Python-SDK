@@ -13,6 +13,7 @@ DELETE = 8
 ###########################
 
 def DEVsetPermissionsForCollection(developer, system, collection, permissionsLevel, roleName):
+    """Set Permissions For Collection as Developer"""
     url = system.url + "/admin/user/" + system.systemKey + "/roles"
     data = {
         "id": roleName,
