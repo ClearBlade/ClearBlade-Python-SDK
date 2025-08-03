@@ -335,7 +335,7 @@ If you don't specify a client_id, the SDK will use a random hex string.
 
 There are a number of callback functions you may assign. 
 Typically, you want to set these callbacks before you connect to the broker. 
-This is a list of the function names and their expected parameters. 
+This is a list of the function names and their expected parameters: 
 - `on_connect(client, userdata, flags, rc)`   
 - `on_disconnect(client, userdata, rc)`   
 - `on_subscribe(client, userdata, mid, granted_qos)`   
@@ -344,7 +344,7 @@ This is a list of the function names and their expected parameters.
 - `on_message(client, userdata, mid)`   
 - `on_log(client, userdata, level, buf)`   
 
-The SDK provides attributes and methods needed for most applications. Occasionally, it may be useful to access the attributes and methods the underlying **paho-mqtt** client. This is available through this public attribute.
+The SDK provides attributes and methods needed for most applications. Occasionally, it may be useful to access the attributes and methods the underlying **paho-mqtt** client. This is available through this public attribute:
 - `paho_client`
 
 For more information about the individual callbacks and attributes, see the [paho-mqtt](https://github.com/eclipse/paho.mqtt.python#callbacks) documentation.   
