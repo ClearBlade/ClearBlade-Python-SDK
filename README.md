@@ -344,7 +344,7 @@ This is a list of the function names and their expected parameters.
 - `on_message(client, userdata, mid)`   
 - `on_log(client, userdata, level, buf)`   
 
-The SDK provides attributes and methods needed for most applications. Occasionally, it may be useful to access the attributes and methods the underlying **paho-mqtt** client. This is available through this attribute.
+The SDK provides attributes and methods needed for most applications. Occasionally, it may be useful to access the attributes and methods the underlying **paho-mqtt** client. This is available through this public attribute.
 - `paho_client`
 
 For more information about the individual callbacks and attributes, see the [paho-mqtt](https://github.com/eclipse/paho.mqtt.python#callbacks) documentation.   
