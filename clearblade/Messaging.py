@@ -49,6 +49,7 @@ class Messaging:
         self.on_publish = None
         self.on_message = None
         self.on_log = None
+        self.paho_client = self.__mqttc
 
         # internal variables
         if url:
