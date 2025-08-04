@@ -64,6 +64,19 @@ from clearblade.ClearBladeCore import cbLogs
 cbLogs.DEBUG = False
 cbLogs.MQTT_DEBUG = False
 ```
+**NOTE:**
+
+If you want output of messages to be controlled by python's logging module, set the `cbLogs.USE_LOGGING = True`. The MQTT messages are written to the `Mqtt` named logger and `CB` logs are written to the `CB` named logger. So for a configuration that outputs all debug information via the standard library logging module (instead print statements), use:
+
+```python
+from clearblade.ClearBladeCore import cbLogs
+
+# logging via the standard logging module
+cbLogs.DEBUG = True
+cbLogs.MQTT_DEBUG = True
+cbLogs.USE_LOGGING = True
+```
+
 ---
 ### Systems
 On the ClearBlade Platform, you develop IoT solutions through **systems**. 
