@@ -37,6 +37,7 @@ class System:
     #############
 
     def User(self, email, password="", authToken=""):
+        """Authenticate & return User"""
         user = Users.User(self, email, password=password, authToken=authToken)
         if authToken == "":
             user.authenticate()
@@ -48,16 +49,19 @@ class System:
             cbErrors.handle(-1)
 
     def AnonUser(self):
+        """Authenticate & return Anon User"""
         anon = Users.AnonUser(self)
         anon.authenticate()
         return anon
 
     def registerUser(self, authenticatedUser, email, password):
+        """Register User"""
         n00b = Users.registerUser(self, authenticatedUser, email, password)
         self.users.append(n00b)
         return n00b
 
     def ServiceUser(self, email, token):
+        """Register & return new Service Account User"""
         user = Users.ServiceUser(self, email, token)
         if user.checkAuth():
             return user
@@ -70,14 +74,17 @@ class System:
     ###############
 
     def getDevices(self, authenticatedUser, query=None):
+        """Return Devices"""
         self.devices = Devices.getDevices(self, authenticatedUser, query)
         return self.devices
 
     def getDevice(self, authenticatedUser, name):
+        """Return Device by Name"""
         dev = Devices.getDevice(self, authenticatedUser, name)
         return dev
 
     def Device(self, name, key="", authToken="", x509keyPair=None):
+        """Authenticate & return Device"""
         dev = Devices.Device(system=self, name=name, key=key, authToken=authToken, x509keyPair=x509keyPair)
         # check if dev in self.devices?
         return dev
@@ -87,6 +94,7 @@ class System:
     ############
 
     def Collection(self, authenticatedUser, collectionID="", collectionName=""):
+        """Return Collection by Name or ID"""
         if not collectionID and not collectionName:
             cbLogs.error("beep")
             cbErrors.handle(-1)
@@ -99,6 +107,7 @@ class System:
     ############
 
     def Messaging(self, user, port=1883, keepalive=30, url="", client_id="", clean_session=None, use_tls=False):
+        """Return Messaging Object"""
         msg = Messaging.Messaging(user, port, keepalive, url, client_id=client_id, clean_session=clean_session, use_tls=use_tls)
         self.messagingClients.append(msg)
         return msg
@@ -108,6 +117,7 @@ class System:
     ############
 
     def Service(self, name):
+        """Return Code Service"""
         return Code.Service(self, name)
 
 
@@ -117,6 +127,13 @@ class Query:
         self.filters = []
 
     def Or(self, query):
+        """
+        Query 'Or' function.
+
+        # NOTE: you can't add filters after
+        # you Or two queries together.
+        # This function has to be the last step.
+        """
         # NOTE: you can't add filters after
         # you Or two queries together.
         # This function has to be the last step.
@@ -133,22 +150,29 @@ class Query:
         self.filters[0].append({operator: [{column: value}]})
 
     def equalTo(self, column, value):
+        """'EQ' (Equal To) Query function"""
         self.__addFilter(column, value, "EQ")
 
     def greaterThan(self, column, value):
+        """'GT' (Greater Than) Query function"""
         self.__addFilter(column, value, "GT")
 
     def lessThan(self, column, value):
+        """'LT' (Less Than) Query function"""
         self.__addFilter(column, value, "LT")
 
     def greaterThanEqualTo(self, column, value):
+        """'GTE' (Greater Than or Equal) Query function"""
         self.__addFilter(column, value, "GTE")
 
     def lessThanEqualTo(self, column, value):
+        """'LTE' (Less Than or Equal) Query function"""
         self.__addFilter(column, value, "LTE")
 
     def notEqualTo(self, column, value):
+        """'NEQ' (Not Equal To) Query function"""
         self.__addFilter(column, value, "NEQ")
 
     def matches(self, column, value):
+        """'RE' (Matches) Query function"""
         self.__addFilter(column, value, "RE")

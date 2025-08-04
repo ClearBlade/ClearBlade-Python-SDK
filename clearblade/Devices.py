@@ -5,6 +5,7 @@ from . import restcall
 
 
 def getDevices(system, authenticatedUser, query=None):
+    """Return Devices as Authenticated User"""
     if query:
         params = {}
         params["FILTERS"] = query.filters
@@ -18,6 +19,7 @@ def getDevices(system, authenticatedUser, query=None):
 
 
 def getDevice(system, authenticatedUser, name):
+    """Return Device as Authenticated User"""
     url = system.url + "/api/v/2/devices/" + system.systemKey + "/" + name
     resp = restcall.get(url, headers=authenticatedUser.headers, sslVerify=system.sslVerify)
     return resp
@@ -49,6 +51,7 @@ class Device:
             cbErrors.handle(-1)
 
     def authorize(self, key):
+        """Authenticate as Device"""
         cbLogs.info("Authenticating", self.name, "as a device...")
         credentials = {
             "deviceName": self.name,
@@ -60,6 +63,7 @@ class Device:
         cbLogs.info("Successfully authenticated!")
 
     def authorize_x509(self, x509keyPair):
+        """Authenticate as Device using x509 Key Pair"""
         cbLogs.info("Authenticating", self.name, "as a device using x509 key pair...")
         credentials = {
             "system_key": self.systemKey,
@@ -71,6 +75,7 @@ class Device:
         cbLogs.info("Successfully authenticated!")
 
     def update(self, info):
+        """Update Device"""
         payload = info
         try:
             json.loads(payload)
@@ -85,6 +90,7 @@ class Device:
 ###########################
 
 def DEVnewDevice(developer, system, name, enabled=True, type="", state="", active_key="", allow_certificate_auth=False, allow_key_auth=True, certificate="", description="", keys=""):
+    """Create Device as Developer"""
     url = system.url + "/admin/devices/" + system.systemKey + "/" + name
     data = {
         "active_key": active_key,
@@ -104,6 +110,7 @@ def DEVnewDevice(developer, system, name, enabled=True, type="", state="", activ
 
 
 def DEVgetDevices(developer, system, query=None):
+    """Return Devices as Developer"""
     if query:
         params = {}
         params["FILTERS"] = query.filters
@@ -117,12 +124,14 @@ def DEVgetDevices(developer, system, query=None):
 
 
 def DEVgetDevice(developer, system, name):
+    """Return Device as Developer"""
     url = system.url + "/api/v/2/devices/" + system.systemKey + "/" + name
     resp = restcall.get(url, headers=developer.headers, sslVerify=system.sslVerify)
     return resp
 
 
 def DEVupdateDevice(developer, system, name, updates):
+    """Update Device as Developer"""
     url = system.url + "/api/v/2/devices/" + system.systemKey + "/" + name
     resp = restcall.put(url, headers=developer.headers, data=updates, sslVerify=system.sslVerify)
     cbLogs.info("Successfully updated device:", name + ".")
@@ -130,6 +139,7 @@ def DEVupdateDevice(developer, system, name, updates):
 
 
 def DEVdeleteDevice(developer, system, name):
+    """Delete Device as Developer"""
     url = system.url + "/api/v/2/devices/" + system.systemKey + "/" + name
     resp = restcall.delete(url, headers=developer.headers, sslVerify=system.sslVerify)
     cbLogs.info("Successfully deleted device:", name + ".")
